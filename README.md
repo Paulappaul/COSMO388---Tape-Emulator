@@ -1,3 +1,6 @@
+
+![COSMO388 ROUGH](https://github.com/Paulappaul/COSMO388---Tape-Emulator/assets/38223440/0dad1c8b-67fd-4011-b359-b8f9115f3007)
+
 Cosmo 388 is the first DAW from Simulacra Sound. This fully functional workstation is designed to replicate the legendary Tascam 388 reel-to-reel tape machine. With its 8 channels for recording and playback, animated VU meters, and lifelike reel-to-reel movement, Cosmo 388 immerses you in the world of authentic analog recording.
 
 Through advanced convolution techniques, this powerful DAW faithfully captures the warmth, saturation, and dynamic response of an analog tape machine. As you play, record, and mix your music, Cosmo 388 reacts dynamically to your input signal's amplitude, just like a genuine tape machine would.
