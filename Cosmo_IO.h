@@ -1,6 +1,234 @@
 #pragma once
 #include "Cosmo.h"
 
+double tapeSaturationFunction(double in, double alpha)
+{
+    return (2 / pi) * std::atan(in * alpha);
+}
+
+static int playbackCallback(const void* inputBuffer, void* outputBuffer,
+    unsigned long framesPerBuffer,
+    const PaStreamCallbackTimeInfo* timeInfo,
+    PaStreamCallbackFlags statusFlags,
+    void* userData)
+{
+    float* out = static_cast<float*>(outputBuffer);
+    PlaybackData* playbackData = static_cast<PlaybackData*>(userData);
+
+    const auto& audioBuffer = playbackData->audioFile->samples[0]; // Assuming mono audio
+
+
+    if (playbackData->currentTime < playbackData->startTime)
+    {
+     
+    }
+    else if (playbackData->currentTime >= playbackData->startTime && playbackData->currentFrame < playbackData->endTime)
+    {
+        for (unsigned long i = 0; i < framesPerBuffer; ++i)
+        {
+            // Check if the current frame index exceeds the audioBuffer size
+            if (playbackData->currentFrame >= audioBuffer.size())
+                break;
+
+            // Copy the audio data from the buffer to the output
+            *out++ = audioBuffer[playbackData->currentFrame++] * project.sliderVolume[1];
+        }
+    }
+    else if (playbackData->currentFrame >= playbackData->endTime)
+    {
+     
+       return paComplete;
+
+      
+    }
+
+    return paContinue;
+}
+
+
+
+void playbackThread(const std::string& filePath, unsigned long startTime, unsigned long endTime) //channel locations enabled for playback
+{
+
+    int framesPerBuffer = 256;
+
+    // Load the WAV file
+    std::cout << "PLAYBACK LOAD PATH: " << filePath << std::endl;
+    AudioFile<float> audioFile;
+
+    audioFile.load(filePath);
+    // std::cout << "test to see before or after filepath" << std::endl;
+
+     // Initialize PortAudio and open a stream
+    PaStream* audioStream;
+
+    PlaybackData playbackData;
+    playbackData.audioFile = &audioFile;
+
+
+    playbackData.currentTime = (hour * 3600 + minute * 60 + second) * sRate;
+    playbackData.startTime = startTime;
+    playbackData.endTime = endTime;
+
+    playbackData.currentFrame = playbackData.currentTime - playbackData.startTime;
+    playbackData.currentFrame = std::min(playbackData.currentFrame, playbackData.endTime);
+
+
+    // Open the stream
+    err = Pa_OpenStream(
+        &audioStream,
+        &inputParameters,
+        &outputParameters,
+        sRate,
+        framesPerBuffer,
+        paNoFlag,
+        playbackCallback, // Set the callback function
+        &playbackData // Pass the playback data as user data
+    );
+
+    if (err != paNoError) {
+        std::cout << "Error opening PortAudio stream: " << Pa_GetErrorText(err) << std::endl;
+        return;
+    }
+
+    // Start the stream
+    err = Pa_StartStream(audioStream);
+    if (err != paNoError) {
+        std::cout << "Error starting PortAudio stream: " << Pa_GetErrorText(err) << std::endl;
+        return;
+    }
+
+    while (Pa_IsStreamActive(audioStream) && playBackOn)
+    {
+        Pa_Sleep(10); // Sleep for a short duration before checking again
+    }
+
+    // Stop and close the stream
+    err = Pa_StopStream(audioStream);
+    if (err != paNoError) {
+        std::cout << "Error stopping PortAudio stream: " << Pa_GetErrorText(err) << std::endl;
+    }
+
+    err = Pa_CloseStream(audioStream);
+    if (err != paNoError) {
+        std::cout << "Error closing PortAudio stream: " << Pa_GetErrorText(err) << std::endl;
+    }
+}
+
+
+
+//This functions as a net, its catch must be passed to a struct. 
+static int callBack1
+(const void* input,
+    void* output,
+    unsigned long frameCount,
+    const PaStreamCallbackTimeInfo* timeInfo,
+    PaStreamCallbackFlags statusFlags,
+    void* userData)
+{
+
+
+    dataBuffer* datapass = (dataBuffer*)userData;
+    float* inputSamples = (float*)input;
+    float* outputSamples = (float*)output;
+
+
+
+    if (ChannelNum > 1)
+    {
+        for (unsigned int i = 0; i < frameCount; i++)
+        {
+            for (int channel = 0; channel < 2; channel++)
+            {
+                float sample = inputSamples[i * 2 + channel];  // Assuming stereo audio
+                datapass->recordedSamples.push_back(sample);
+            }
+        }
+    }
+
+    else if (ChannelNum == 1)
+    {
+        for (unsigned int i = 0; i < frameCount; i++)
+        {
+
+            if (High_gain_db >= 0.0)
+            {
+
+                double x0 = inputSamples[i];
+                if (i == 0)
+                {
+                    /*I don't think we need to calculate the frequencies during each iteration,
+                    we set them and they remain constant till the user changes them. But I should check if this
+                    actually slows everything down and if impedes real time alteration of the EQ. But this should also be recallibrated
+                    whenver the filter is changed, which makes it unusuable during normal funcitoning...
+                    */
+                    datapass->calculateBoostCofficients(High_gain_db, High_Q, High_fc, sRate);
+                }
+
+
+                double y0 = datapass->a0 * x0 + datapass->a1 * datapass->x1 + datapass->a2 * datapass->x2
+                    - datapass->b1 * datapass->y1 - datapass->b2 * datapass->y2;
+
+               
+               // datapass->recordedSamples.push_back(y0);
+
+               // outputSamples[i] = static_cast<float>(y0);
+
+
+          
+                double final = tapeSaturationFunction(y0, DialData.saturationGain[datapass->dataChannel]) + y0;
+
+                datapass->recordedSamples.push_back(final);
+
+                outputSamples[i] = static_cast<float>(final);
+                
+
+                // Update state variables
+                datapass->x2 = datapass->x1;
+                datapass->x1 = x0;
+                datapass->y2 = datapass->y1;
+                datapass->y1 = y0;
+
+
+    
+
+            }
+            else if (High_gain_db < 0) // Calculate Notch Filter
+            {
+
+                double x0 = inputSamples[i];
+
+                if (i == 0)
+                {
+                    datapass->calculateNotchCofficients(High_gain_db, High_Q, High_fc, sRate);
+                }
+
+                double y0 = datapass->a0 * x0 + datapass->a1 * datapass->x1 + datapass->a2 * datapass->x2
+                    - datapass->b1 * datapass->y1 - datapass->b2 * datapass->y2;
+
+              //  datapass->recordedSamples.push_back(y0);
+              //  outputSamples[i] = static_cast<float>(y0);
+
+                double final = tapeSaturationFunction(y0, DialData.saturationGain[datapass->dataChannel]) + y0;
+
+                datapass->recordedSamples.push_back(final);
+
+                outputSamples[i] = static_cast<float>(final);
+
+                // Update state variables
+                datapass->x2 = datapass->x1;
+                datapass->x1 = x0;
+                datapass->y2 = datapass->y1;
+                datapass->y1 = y0;
+
+            }
+        }
+    }
+
+    return paContinue;
+
+}
+
 void intialize(PaError& err)
 {
     //Initalization 
@@ -186,6 +414,8 @@ void openStream(dataBuffer& datapass, PaError& err)
     int framesPerBuffer = 256;
     PaStream* audioStream;
 
+    std::cout << "datapass datachannel = " << datapass.dataChannel << std::endl;
+    std::cout << DialData.saturationGain[datapass.dataChannel] << "this is the value!" << std::endl;
 
     err = Pa_OpenStream(
         &audioStream,
@@ -241,118 +471,4 @@ void openStreamAsync(dataBuffer &datapass, PaError& err)
 
     audioThread.detach();  // Detach the thread to let it run independently
 }
-
-
-/*
-
-THIS IS THE TERMINAL LEGACY CODE FOR STREAMSETUP 
-
-
-void StreamSetup(PaError& err)
-{
-
-    int numDevices;
-    numDevices = Pa_GetDeviceCount();
-
-    //Error Checking
-    if (numDevices < 0)
-    {
-        printf("ERROR: Pa_CountDevices returned 0x%x\n", numDevices);
-        err = numDevices;
-        terminate(err);
-    }
-    std::cout << "DEVICES FOUND:: " << numDevices << std::endl;
-
-    //A struct which holds Device information
-    const   PaDeviceInfo* deviceInfo;
-
-    //iterate throught the different devices
-    for (int i = 0; i < numDevices; i++)
-    {
-        deviceInfo = Pa_GetDeviceInfo(i);
-        std::cout << i << " " << deviceInfo->name << std::endl;
-
-    }
-
-    //USER REVIEW AND DEBUG
-    int userChoice = 0;
-    std::cout << "Choose a device to Review, 100 to exit" << std::endl;
-    std::cin >> userChoice;
-    while (userChoice != 100)
-    {
-        deviceInfo = Pa_GetDeviceInfo(userChoice);
-        std::cout << "NAME: " << deviceInfo->name << " SAMPLE RATE: "
-            << deviceInfo->defaultSampleRate << " Max Input Channels: "
-            << deviceInfo->maxInputChannels << " Max Output Channels: "
-            << deviceInfo->maxOutputChannels << "input latency: "
-            << deviceInfo->defaultLowInputLatency << "output latency: "
-            << deviceInfo->defaultLowOutputLatency <<
-            std::endl;
-
-        std::cout << "Choose a device to Review, 100 to exit" << std::endl;
-        std::cin >> userChoice;
-    }
-
-    //Intialize a Device for Streaming
-    std::cout << "Choose a Device to use for Streaming" << std::endl;
-    std::cin >> userChoice;
-    deviceInfo = Pa_GetDeviceInfo(userChoice);
-
-    std::cout << "input device is: " << deviceInfo->name << std::endl;
-
-
-
-
-    //handle Inputs
-    inputParameters.device = userChoice;
-    inputParameters.channelCount = deviceInfo->maxInputChannels;
-    inputParameters.hostApiSpecificStreamInfo = NULL; //or &devinceInfo?
-    inputParameters.sampleFormat = paFloat32;
-    inputParameters.suggestedLatency = deviceInfo->defaultLowInputLatency;
-
-
-    if (deviceInfo->maxInputChannels > 1)
-    {
-
-        std::cout << "Channel Count is larger then 1. Would you like to establish a Mono Stream? 1/0" << std::endl;
-        std::cin >> userChoice;
-        if (userChoice == 1)
-        {
-            inputParameters.channelCount = 1;
-            ChannelNum = 1;
-        }
-        else { std::cout << "STREAM Channel count: " << deviceInfo->maxInputChannels << std::endl; ChannelNum = 2; }
-
-    }
-
-
-    std::cout << "Output Choice" << std::endl;
-
-    std::cin >> userChoice;
-    deviceInfo = Pa_GetDeviceInfo(userChoice);
-
-    std::cout << "Output device is: " << deviceInfo->name << std::endl;
-
-    //handle Outputs
-    outputParameters.device = userChoice;
-    outputParameters.channelCount = 1; //deviceInfo->maxOutputChannels;
-    outputParameters.hostApiSpecificStreamInfo = NULL;
-    outputParameters.sampleFormat = paFloat32;
-    outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
-
-    //Intialize Stream 
-    sRate = deviceInfo->defaultSampleRate;
-    std::cout << "Intializing Stream... Sample Rate is: " << sRate << std::endl;
-    if (sRate < 48000)
-    {
-        std::cout << "Would you like to Switch to 48khz? 1/0" << std::endl;
-        std::cin >> userChoice;
-        if (userChoice == 1)
-        {
-            sRate = 48000;
-        }
-        else { std::cout << "Sample Rate: " << deviceInfo->defaultSampleRate << std::endl; }
-    }
-
-}*/
 

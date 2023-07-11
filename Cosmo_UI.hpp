@@ -234,8 +234,24 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
 
 }
 
-void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG)
+
+
+
+void saturationDialCallback(Fl_Widget* widget, void* userData) 
 {
+    int* dialChannel = static_cast<int*>(userData);
+    Fl_Dial* saturationDial = dynamic_cast<Fl_Dial*>(widget);
+    DialData.saturationGain[*dialChannel] = saturationDial->value();
+
+    std::cout << "dial at: " << *dialChannel << " is: " << DialData.saturationGain[*dialChannel];
+
+}
+
+void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG, int channel)
+{
+
+    int* channelPtr = new int(channel);
+
     Fl_Box* SendBox = new Fl_Box(FL_FLAT_BOX, x - 10, y - 10, 95, 200, 0);
     SendBox->image(SendBG);
     Fl_Dial* Send1_1 = new Fl_Dial(x, y, w, h, 0);
@@ -244,8 +260,13 @@ void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG)
     Send2_1->color(fl_rgb_color(28,117,188));
     Send1_1->type(FL_LINE_DIAL);
     Send2_1->type(FL_LINE_DIAL);
+    Send1_1->bounds(0.0, 10.0);
+
+    Send1_1->callback(saturationDialCallback, static_cast<void*>(channelPtr));
 
 }
+
+
 /**********************************************************************************************File_Folder_CREATION**************************************************************************************/
 
 
@@ -494,6 +515,7 @@ void recordButtonCallback(Fl_Widget* button, void* userData)
            std::string stopTime = std::to_string(hour) + "_" + std::to_string(minute) + "_" + std::to_string(second);
            project.channelStartTimes[i] = recStartTime;
            dataBuffer* datapass = new dataBuffer;
+           datapass->dataChannel = i;
 
             isRecording = true;
             recButton->label("@circle");
@@ -716,7 +738,7 @@ void loadButtonCallback(Fl_Widget* widget, void*)
             selectedNumber = atoi(numStr);
             project.channelLocations[selectedNumber -1] = filename;
             std::cout << project.channelLocations[selectedNumber] << " written to channel location " << numStr << std::endl;
-            
+         //   convolution(selectedNumber - 1); convolution is seeking a raw name, not a rando name error
         }
     }
 
@@ -973,14 +995,14 @@ Fl_Window* mainWindow()
     Fl_PNG_Image* SendBG = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\eqdial.png");
 
     //SENDS 1 AND 2 
-    Send_Dials(60, 450, 75, 75, SendBG);
-    Send_Dials(210, 450, 75, 75, SendBG);
-    Send_Dials(360, 450, 75, 75, SendBG);
-    Send_Dials(510, 450, 75, 75, SendBG);
-    Send_Dials(660, 450, 75, 75, SendBG);
-    Send_Dials(810, 450, 75, 75, SendBG);
-    Send_Dials(960, 450, 75, 75, SendBG);
-    Send_Dials(1110, 450, 75, 75, SendBG);
+    Send_Dials(60, 450, 75, 75, SendBG, 0);
+    Send_Dials(210, 450, 75, 75, SendBG, 1);
+    Send_Dials(360, 450, 75, 75, SendBG, 2);
+    Send_Dials(510, 450, 75, 75, SendBG, 3);
+    Send_Dials(660, 450, 75, 75, SendBG, 4);
+    Send_Dials(810, 450, 75, 75, SendBG,5);
+    Send_Dials(960, 450, 75, 75, SendBG,6);
+    Send_Dials(1110, 450, 75, 75, SendBG, 7);
 
 
 

@@ -64,6 +64,31 @@ void WriteAudio(dataBuffer& datapass, int channel2Write)
 
 }
 
+std::vector<double> WOW_and_FLUTTER_Function(const std::vector<double>& x, int SAMPLERATE, double Modfreq, double Width)
+{
+    int WIDTH = static_cast<int>(std::round(Width * SAMPLERATE));
+    double MODFREQ = Modfreq / SAMPLERATE;
+    int LEN = x.size();
+    int L = 2 + WIDTH + WIDTH * 2;
+    std::vector<double> Delayline(L, 0.0);
+    std::vector<double> y(LEN, 0.0);
+
+    for (int n = 0; n < LEN; n++)
+    {
+        double MOD = std::sin(MODFREQ * 2 * pi * n);
+        double TAP = 1 + WIDTH + WIDTH * MOD;
+        int i = static_cast<int>(std::floor(TAP));
+        double frac = TAP - i;
+        Delayline.insert(Delayline.begin(), x[n]);
+        Delayline.resize(L);
+
+        // Linear Interpolation
+        y[n] = Delayline[i + 1] * frac + Delayline[i] * (1 - frac);
+    }
+
+    return y;
+}
+
 void convolution(int channelName)
 {
     FFTConvolver fft;
@@ -183,11 +208,6 @@ void convolution(int channelName)
 
 
 }
-
-
-
-
-
 
 
 void readFile()
