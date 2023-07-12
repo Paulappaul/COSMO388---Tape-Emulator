@@ -192,10 +192,19 @@ void convolution(int channelName, int load)
     // Create an AudioFile object
     AudioFile<float> audioFile;
 
+
+
+    // Convert float to std::vector<double>
+    std::vector<double> audioDataDouble(combinedSignal.begin(), combinedSignal.end());
+
+    // Apply WOW and FLUTTER effect
+    std::vector<double> processedData = WOW_and_FLUTTER_Function(audioDataDouble, sRate, wFdepth, wFrate);
+
     // Create a multi-channel buffer with a single channel
     AudioFile<float>::AudioBuffer buffer;
     buffer.resize(1);
-    buffer[0] = combinedSignal;
+    buffer[0] = std::vector<float>(processedData.begin(), processedData.end());
+
 
     // Set the audio data
     audioFile.setAudioBuffer(buffer);

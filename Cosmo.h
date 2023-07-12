@@ -106,6 +106,10 @@ int selectedNumber = -1;
 //PORTAUDIO 
 bool PAstatus = false;
 
+// Parameters for WOW and FLUTTER effect
+double wFdepth = 0.7;  // Example depth in milliseconds
+double wFrate = 0.002;   // Example rate in Hz
+
 /****************************************************************************************************STRUCTS***********************************************************************************************/
 
 struct dataBuffer
@@ -337,7 +341,5 @@ Fl_Window* mainWindow();
 /********************************************************COSMO_CLOCK.H*************************************************************/
 
 void updateTime(void*);
-
-
 
 double tapeSaturationFunction(double in, double alpha);
