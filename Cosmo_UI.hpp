@@ -194,7 +194,6 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
         EqLow1->color(fl_rgb_color(155, 133, 121));
 
 
-
     }
 
     if (HighDialColor == 1)
@@ -203,7 +202,7 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
         EqLow1->range(2500, 15000);
         EqLow1->callback(highEqCallback);
         EqQ->color(fl_rgb_color(237, 73, 36));
-        EqQ->range(0, 15);
+        EqQ->range(-15, 15);
         EqQ->callback(highGainCallback);
 
     }
@@ -214,7 +213,7 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
         EqQ->color(fl_rgb_color(253, 187, 91));
         EqLow1->range(500, 5000);
         EqLow1->callback(midEqCallback);
-        EqQ->range(0, 15);
+        EqQ->range(-15, 15);
         EqQ->callback(midGainCallback);
 
     }
@@ -224,7 +223,7 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
         EqQ->color(fl_rgb_color(245,255,118));
         EqLow1->range(50, 1000);
         EqLow1->callback(LowEqCallback);
-        EqQ->range(0, 15);
+        EqQ->range(-15, 15);
         EqQ->callback(lowGainCallback);
     }
 
@@ -547,21 +546,34 @@ void recordButtonCallback(Fl_Widget* button, void* userData)
 
 
 
-void playButtonCallback(Fl_Widget* widget, void*)
+void playButtonCallback(Fl_Widget* widget, void* userData)
 {
+    ///
+    rewindOn = false;
+    rewindStop = false;
+    ffOn = false;
+    ffStop = false;
+    ///
+
     intialize(err);
     playBackOn = true;
     std::cout << "playback clicked" << std::endl;
+
+    TransportButtons* transportButtons = static_cast<TransportButtons*>(userData);
+    transportButtons->fastForward->color(FL_WHITE);
+    transportButtons->rewind->color(FL_WHITE);
+    transportButtons->play->color(FL_YELLOW);
 
     for (int i = 0; i < 8; i++)
     {
         if (project.recPlayBackState[i] == false && project.channelLocations[i] != " ")
         {
             std::cout << i << "PROJECT LOCATION: " << project.channelLocations[i] << std::endl;
-            std::thread threadObj(playbackThread, project.channelLocations[i], project.channelStartTimes[i], project.channelLengths[i]);
+         
+            std::thread playback(playbackThread, project.channelLocations[i], project.channelStartTimes[i], project.channelLengths[i], i +1);
 
 
-            threadObj.detach();
+            playback.detach();
         }
 
     }
@@ -608,7 +620,7 @@ void stopButtonCallback(Fl_Widget* widget, void* data)
                
                 
                 WriteAudio(*(project.dataPass[i]), i );
-                convolution(i);
+                convolution(i, 1);
                 project.channelLengths[i] = stopTime;
                 delete project.dataPass[i];
 
@@ -639,7 +651,7 @@ void rewindButtonCallback(Fl_Widget* widget, void* data)
     Fl_Button* RewindButton = dynamic_cast<Fl_Button*>(widget);
 
 
-    if (!isRecording)
+    if (!isRecording || !playBackOn)
     {
 
 
@@ -737,8 +749,10 @@ void loadButtonCallback(Fl_Widget* widget, void*)
         if (numStr != NULL) {
             selectedNumber = atoi(numStr);
             project.channelLocations[selectedNumber -1] = filename;
-            std::cout << project.channelLocations[selectedNumber] << " written to channel location " << numStr << std::endl;
-         //   convolution(selectedNumber - 1); convolution is seeking a raw name, not a rando name error
+            std::cout << project.channelLocations[selectedNumber -1] << " written to channel location " << numStr << std::endl;
+            std::cout << "filename: " << filename << std::endl;
+           convolution(selectedNumber - 1, 0); 
+           createDocument(filePath, project);
         }
     }
 

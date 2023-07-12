@@ -66,19 +66,19 @@ double sRate = 44100;
 const double pi = 3.14159265358979323846;
 
 //High
-double High_gain_db = -15.0; // Set the gain in dB
+double High_gain_db = 0; // Set the gain in dB
 double High_Q = 2.0; // Set the quality factor
-int High_fc = 1000; // Set the center frequency
+int High_fc = 0; // Set the center frequency
 
 //Mid
-double Mid_gain_db = 15.0; // Set the gain in dB
+double Mid_gain_db = 0; // Set the gain in dB
 double Mid_Q = 2.0; // Set the quality factor
-int Mid_fc = 180; // Set the center frequency
+int Mid_fc = 0; // Set the center frequency
 
 //Low
-double Low_gain_db = 15.0; // Set the gain in dB
+double Low_gain_db = 0; // Set the gain in dB
 double Low_Q = 2.0; // Set the quality factor
-int Low_fc = 180; // Set the center frequency
+int Low_fc = 0; // Set the center frequency
 
 //Cosmo_TIME
 int hour = 0;
@@ -132,6 +132,7 @@ struct PlaybackData
     unsigned long startTime;
     unsigned long endTime;
     unsigned long currentTime;
+    unsigned int playBackChannel;
 };
 
 void dataBuffer::calculateNotchCofficients(double gain_db, double Q, int fc, int fs)
@@ -188,6 +189,21 @@ struct dialData
 
     double saturationGain[8] = { 0,0,0,0,0,0,0,0 };
 
+    //High
+    double High_gain_db[8] = { 0, 0, 0, 0, 0, 0, 0, 0 }; // Set the gain in dB
+    double High_Q = 2.0; // Set the quality factor
+    int High_fc[8] = { 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000 }; // Set the center frequency
+
+    //Mid
+    double Mid_gain_db[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };  // Set the gain in dB
+    double Mid_Q = 2.0; // Set the quality factor
+    int Mid_fc[8] = { 5000, 5000,5000,5000,5000,5000,5000,5000 }; // Set the center frequency
+
+    //Low
+    double Low_gain_db[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };  // Set the gain in dB
+    double Low_Q = 2.0; // Set the quality factor
+    int Low_fc[8] = { 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000 }; // Set the center frequency
+
 };
 
 ProjectInfo project;
@@ -213,7 +229,7 @@ static int playbackCallback(const void* inputBuffer, void* outputBuffer, unsigne
     const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
     void* userData);
 
-void playbackThread(const std::string& filePath, unsigned long startTime, unsigned long endTime);
+void playbackThread(const std::string& filePath, unsigned long startTime, unsigned long endTime, int playbackChannel);
 
 static int callBack1(const void* input, void* output, unsigned long frameCount,
     const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
@@ -223,7 +239,7 @@ static int callBack1(const void* input, void* output, unsigned long frameCount,
 /*************************************************************************Convolution.h********************************************************************************/
 
 /*Convolves the Input Signal with the IR, mixes the convolved signal with White Noise and Writes it to Processed Folder*/
-void convolution(int channelName);
+void convolution(int channelName, int load);
 
 /*Writes the data contained in vector<float> recordedSamples; from the dataBuffer struct to a WAV file. The WAV file is stored in the RAW folder*/
 void WriteAudio(dataBuffer& datapass);

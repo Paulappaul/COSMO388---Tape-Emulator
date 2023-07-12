@@ -31,7 +31,7 @@ static int playbackCallback(const void* inputBuffer, void* outputBuffer,
                 break;
 
             // Copy the audio data from the buffer to the output
-            *out++ = audioBuffer[playbackData->currentFrame++] * project.sliderVolume[1];
+            *out++ = audioBuffer[playbackData->currentFrame++] * project.sliderVolume[playbackData->playBackChannel];
         }
     }
     else if (playbackData->currentFrame >= playbackData->endTime)
@@ -47,7 +47,7 @@ static int playbackCallback(const void* inputBuffer, void* outputBuffer,
 
 
 
-void playbackThread(const std::string& filePath, unsigned long startTime, unsigned long endTime) //channel locations enabled for playback
+void playbackThread(const std::string& filePath, unsigned long startTime, unsigned long endTime, int playbackChannel) //channel locations enabled for playback
 {
 
     int framesPerBuffer = 256;
@@ -69,7 +69,7 @@ void playbackThread(const std::string& filePath, unsigned long startTime, unsign
     playbackData.currentTime = (hour * 3600 + minute * 60 + second) * sRate;
     playbackData.startTime = startTime;
     playbackData.endTime = endTime;
-
+    playbackData.playBackChannel = playbackChannel;
     playbackData.currentFrame = playbackData.currentTime - playbackData.startTime;
     playbackData.currentFrame = std::min(playbackData.currentFrame, playbackData.endTime);
 
@@ -335,7 +335,7 @@ void StreamSetup(PaError& err)
 
 
     //Input
-    Fl_Window deviceList(650, 120, "Device Setup");
+    Fl_Window deviceList(650, 120, "Input Device Setup");
     Fl_Choice inputDevice(200, 30, 400, 30, "Choose a Input Device");
 
 
@@ -358,8 +358,8 @@ void StreamSetup(PaError& err)
     }
 
     //Output
-    Fl_Window outputList(400, 120, "Output Device Setup");
-    Fl_Choice outputDevice(200, 30, 400, 25, "Choose a Output Device");
+    Fl_Window outputList(650, 120, "Output Device Setup");
+    Fl_Choice outputDevice(200, 30, 400, 30, "Choose a Output Device");
 
     for (int i = 0; i < numDevices; i++)
     {

@@ -89,11 +89,20 @@ std::vector<double> WOW_and_FLUTTER_Function(const std::vector<double>& x, int S
     return y;
 }
 
-void convolution(int channelName)
+void convolution(int channelName, int load)
 {
     FFTConvolver fft;
+    std::string Input_filename;
+    if (load == 0)
+    {
+        Input_filename = project.channelLocations[channelName];
+            std::cout << "loading: " << project.channelLocations[channelName] << std::endl;
+    }
+    else if (load == 1)
+    {
+         Input_filename = projectPath + "RAW/" + project.channelNames[channelName] + ".wav";
+    }
 
-    const std::string Input_filename = projectPath + "RAW/" + project.channelNames[channelName] + ".wav";
     const std::string Impulse_filename = "C:\\Users\\alcin\\Desktop\\Convolution\\stream\\boy.wav";
     const std::string outputfilename = projectPath + "PROCESSED/" + project.channelNames[channelName] + ".wav";
 
@@ -205,6 +214,13 @@ void convolution(int channelName)
 
     project.channelLocations[channelName] = outputfilename;
 
+    if (load == 0)
+    {
+        project.channelStartTimes[channelName] = 0;
+        project.channelLengths[channelName] = audioFile.getNumSamplesPerChannel();
+        std::cout << "Number of Samples: " << audioFile.getNumSamplesPerChannel() << std::endl;
+
+    }
 
 
 }
