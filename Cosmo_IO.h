@@ -115,8 +115,6 @@ void playbackThread(const std::string& filePath, unsigned long startTime, unsign
     }
 }
 
-
-
 //This functions as a net, its catch must be passed to a struct. 
 static int callBack1
 (const void* input,
@@ -150,70 +148,25 @@ static int callBack1
     {
         for (unsigned int i = 0; i < frameCount; i++)
         {
+            double x0 = inputSamples[i];
+            double y0 = 0;
+            double z0 = 0;
+            double Lz0 = 0;
 
-            if (High_gain_db >= 0.0)
+            
+            if (DialData.High_gain_db[datapass->dataChannel] >= 0)
             {
 
-                double x0 = inputSamples[i];
-                if (i == 0)
-                {
-                    /*I don't think we need to calculate the frequencies during each iteration,
-                    we set them and they remain constant till the user changes them. But I should check if this
-                    actually slows everything down and if impedes real time alteration of the EQ. But this should also be recallibrated
-                    whenver the filter is changed, which makes it unusuable during normal funcitoning...
-                    */
-                    datapass->calculateBoostCofficients(High_gain_db, High_Q, High_fc, sRate);
-                }
-
-
-                double y0 = datapass->a0 * x0 + datapass->a1 * datapass->x1 + datapass->a2 * datapass->x2
-                    - datapass->b1 * datapass->y1 - datapass->b2 * datapass->y2;
-
-               
-               // datapass->recordedSamples.push_back(y0);
-
-               // outputSamples[i] = static_cast<float>(y0);
-
-
-          
-                double final = tapeSaturationFunction(y0, DialData.saturationGain[datapass->dataChannel]) + y0;
-
-                datapass->recordedSamples.push_back(final);
-
-                outputSamples[i] = static_cast<float>(final);
-                
-
-                // Update state variables
-                datapass->x2 = datapass->x1;
-                datapass->x1 = x0;
-                datapass->y2 = datapass->y1;
-                datapass->y1 = y0;
-
-
-    
-
-            }
-            else if (High_gain_db < 0) // Calculate Notch Filter
-            {
-
-                double x0 = inputSamples[i];
 
                 if (i == 0)
                 {
-                    datapass->calculateNotchCofficients(High_gain_db, High_Q, High_fc, sRate);
+
+                    datapass->calculateBoostCofficients(DialData.High_gain_db[datapass->dataChannel], DialData.High_Q, DialData.High_fc[datapass->dataChannel], sRate, 1);
                 }
 
-                double y0 = datapass->a0 * x0 + datapass->a1 * datapass->x1 + datapass->a2 * datapass->x2
+                //end
+                y0 = datapass->a0 * x0 + datapass->a1 * datapass->x1 + datapass->a2 * datapass->x2
                     - datapass->b1 * datapass->y1 - datapass->b2 * datapass->y2;
-
-              //  datapass->recordedSamples.push_back(y0);
-              //  outputSamples[i] = static_cast<float>(y0);
-
-                double final = tapeSaturationFunction(y0, DialData.saturationGain[datapass->dataChannel]) + y0;
-
-                datapass->recordedSamples.push_back(final);
-
-                outputSamples[i] = static_cast<float>(final);
 
                 // Update state variables
                 datapass->x2 = datapass->x1;
@@ -222,12 +175,118 @@ static int callBack1
                 datapass->y1 = y0;
 
             }
+            else if(DialData.High_gain_db[datapass->dataChannel] < 0)
+            {
+
+                if (i == 0)
+                {
+
+                    datapass->calculateNotchCofficients(DialData.High_gain_db[datapass->dataChannel], DialData.High_Q, DialData.High_fc[datapass->dataChannel], sRate, 1);
+                }
+
+                //end
+                y0 = datapass->a0 * x0 + datapass->a1 * datapass->x1 + datapass->a2 * datapass->x2
+                    - datapass->b1 * datapass->y1 - datapass->b2 * datapass->y2;
+
+                // Update state variables
+                datapass->x2 = datapass->x1;
+                datapass->x1 = x0;
+                datapass->y2 = datapass->y1;
+                datapass->y1 = y0;
+
+
+            }
+            
+            if (DialData.Mid_gain_db[datapass->dataChannel] >= 0)
+            {
+                if (i == 0)
+                {
+                    datapass->calculateBoostCofficients(DialData.Mid_gain_db[datapass->dataChannel], DialData.Mid_Q, DialData.Mid_fc[datapass->dataChannel], sRate, 2);
+                }
+
+                // End
+                z0 = datapass->mid_a0 * x0 + datapass->mid_a1 * datapass->mid_x1 + datapass->mid_a2 * datapass->mid_x2
+                    - datapass->mid_b1 * datapass->mid_y1 - datapass->mid_b2 * datapass->mid_y2;
+
+                // Update state variables
+                datapass->mid_x2 = datapass->mid_x1;
+                datapass->mid_x1 = x0;
+                datapass->mid_y2 = datapass->mid_y1;
+                datapass->mid_y1 = z0;
+            }
+            else if (DialData.Mid_gain_db[datapass->dataChannel] < 0)
+            {
+                if (i == 0)
+                {
+                    datapass->calculateNotchCofficients(DialData.Mid_gain_db[datapass->dataChannel], DialData.Mid_Q, DialData.Mid_fc[datapass->dataChannel], sRate, 2);
+                }
+
+                // End
+                z0 = datapass->mid_a0 * x0 + datapass->mid_a1 * datapass->mid_x1 + datapass->mid_a2 * datapass->mid_x2
+                    - datapass->mid_b1 * datapass->mid_y1 - datapass->mid_b2 * datapass->mid_y2;
+
+                // Update state variables
+                datapass->mid_x2 = datapass->mid_x1;
+                datapass->mid_x1 = x0;
+                datapass->mid_y2 = datapass->mid_y1;
+                datapass->mid_y1 = z0;
+            }
+
+            if (DialData.Low_gain_db[datapass->dataChannel] >= 0)
+            {
+                if (i == 0)
+                {
+                    datapass->calculateBoostCofficients(DialData.Low_gain_db[datapass->dataChannel], DialData.Low_Q, DialData.Low_fc[datapass->dataChannel], sRate, 3);
+                }
+
+                // End
+                Lz0 = datapass->low_a0 * x0 + datapass->low_a1 * datapass->low_x1 + datapass->low_a2 * datapass->low_x2
+                    - datapass->low_b1 * datapass->low_y1 - datapass->low_b2 * datapass->low_y2;
+
+                // Update state variables
+                datapass->low_x2 = datapass->low_x1;
+                datapass->low_x1 = x0;
+                datapass->low_y2 = datapass->low_y1;
+                datapass->low_y1 = Lz0;
+            }
+            else if (DialData.Low_gain_db[datapass->dataChannel] < 0)
+            {
+                if (i == 0)
+                {
+                    datapass->calculateNotchCofficients(DialData.Low_gain_db[datapass->dataChannel], DialData.Low_Q, DialData.Low_fc[datapass->dataChannel], sRate, 3);
+                }
+
+                // End
+                Lz0 = datapass->low_a0 * x0 + datapass->low_a1 * datapass->low_x1 + datapass->low_a2 * datapass->low_x2
+                    - datapass->low_b1 * datapass->low_y1 - datapass->low_b2 * datapass->low_y2;
+
+                // Update state variables
+                datapass->low_x2 = datapass->low_x1;
+                datapass->low_x1 = x0;
+                datapass->low_y2 = datapass->low_y1;
+                datapass->low_y1 = Lz0;
+            }
+
+
+
+
+            datapass->recordedSamples.push_back(y0 * 0.33 + z0 * 0.33 + Lz0 * 0.33);
+
+            outputSamples[i] = static_cast<float>(y0 * 0.33 + z0 * 0.33 + Lz0 * 0.33);
+
+
         }
+
     }
+            
+     
+    
 
     return paContinue;
 
 }
+
+
 
 void intialize(PaError& err)
 {

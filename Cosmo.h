@@ -114,17 +114,30 @@ double wFrate = 0.002;   // Example rate in Hz
 
 struct dataBuffer
 {
-    // Struct members
+    // Struct members for HighEQ coefficients
     double a0 = 0, a1 = 0, a2 = 0;
     double b1 = 0, b2 = 0;
     double x1 = 0, x2 = 0;
     double y1 = 0, y2 = 0;
+
+    // Struct members for midEQ coefficients
+    double mid_a0 = 0, mid_a1 = 0, mid_a2 = 0;
+    double mid_b1 = 0, mid_b2 = 0;
+    double mid_x1 = 0, mid_x2 = 0;
+    double mid_y1 = 0, mid_y2 = 0;
+
+    // Struct members for lowEQ coefficients
+    double low_a0 = 0, low_a1 = 0, low_a2 = 0;
+    double low_b1 = 0, low_b2 = 0;
+    double low_x1 = 0, low_x2 = 0;
+    double low_y1 = 0, low_y2 = 0;
+
     std::vector<float> recordedSamples;
     int dataChannel = 0;
 
     // Member functions
-    void calculateNotchCofficients(double gain_db, double Q, int fc, int fs);
-    void calculateBoostCofficients(double gain_db, double Q, int fc, int fs);
+    void calculateNotchCofficients(double gain_db, double Q, int fc, int fs, int flag);
+    void calculateBoostCofficients(double gain_db, double Q, int fc, int fs, int flag);
 };
 
 //Holds the playback data which used by the PlayBack Stream
@@ -139,36 +152,110 @@ struct PlaybackData
     unsigned int playBackChannel;
 };
 
-void dataBuffer::calculateNotchCofficients(double gain_db, double Q, int fc, int fs)
+void dataBuffer::calculateNotchCofficients(double gain_db, double Q, int fc, int fs, int flag)
 {
-    double K = 2.0 * pi * fc / fs;
-    double V0 = pow(10.0, gain_db / 20.0);
-    double d0 = 1.0 + K / Q + pow(K, 2.0);
-    double a = 1.0 + K / (V0 * Q) + pow(K, 2.0);
-    double b = 2.0 * (pow(K, 2.0) - 1.0);
-    double g = 1.0 - K / Q + pow(K, 2.0);
-    double d = 1.0 - K / (V0 * Q) + pow(K, 2.0);
-    a0 = d0 / a;
-    a1 = b / a;
-    a2 = g / a;
-    b1 = b / a;
-    b2 = d / a;
+    if (flag == 1)
+    {
+        double K = 2.0 * pi * fc / fs;
+        double V0 = pow(10.0, gain_db / 20.0);
+        double d0 = 1.0 + K / Q + pow(K, 2.0);
+
+        double a = 1.0 + K / (V0 * Q) + pow(K, 2.0);
+        double b = 2.0 * (pow(K, 2.0) - 1.0);
+        double g = 1.0 - K / Q + pow(K, 2.0);
+        double d = 1.0 - K / (V0 * Q) + pow(K, 2.0);
+        a0 = d0 / a;
+        a1 = b / a;
+        a2 = g / a;
+        b1 = b / a;
+        b2 = d / a;
+    }
+    else if (flag == 2)
+    {
+        double mid_K = 2.0 * pi * fc / fs;
+        double mid_V0 = pow(10.0, gain_db / 20.0);
+        double mid_d0 = 1.0 + mid_K / Q + pow(mid_K, 2.0);
+   
+        double mid_a = 1.0 + mid_K / (mid_V0 * Q) + pow(mid_K, 2.0);
+        double mid_b = 2.0 * (pow(mid_K, 2.0) - 1.0);
+        double mid_g = 1.0 - mid_K / Q + pow(mid_K, 2.0);
+        double mid_d = 1.0 - mid_K / (mid_V0 * Q) + pow(mid_K, 2.0);
+        mid_a0 = mid_d0 / mid_a;
+        mid_a1 = mid_b / mid_a;
+        mid_a2 = mid_g / mid_a;
+        mid_b1 = mid_b / mid_a;
+        mid_b2 = mid_d / mid_a;
+    }
+    else if (flag == 3)
+    {
+        // Calculate lowEQ coefficients
+        double low_K = 2.0 * pi * fc / fs;
+        double low_V0 = pow(10.0, gain_db / 20.0);
+        double low_d0 = 1.0 + low_K / Q + pow(low_K, 2.0);
+        double low_a = 1.0 + low_K / (low_V0 * Q) + pow(low_K, 2.0);
+        double low_b = 2.0 * (pow(low_K, 2.0) - 1.0);
+        double low_g = 1.0 - low_K / Q + pow(low_K, 2.0);
+        double low_d = 1.0 - low_K / (low_V0 * Q) + pow(low_K, 2.0);
+        low_a0 = low_d0 / low_a;
+        low_a1 = low_b / low_a;
+        low_a2 = low_g / low_a;
+        low_b1 = low_b / low_a;
+        low_b2 = low_d / low_a;
+    }
 }
 
-void dataBuffer::calculateBoostCofficients(double gain_db, double Q, int fc, int fs)
+void dataBuffer::calculateBoostCofficients(double gain_db, double Q, int fc, int fs, int flag)
 {
-    double K = 2.0 * pi * fc / fs;
-    double V0 = pow(10.0, gain_db / 20.0);
-    double d0 = 1.0 + K / Q + pow(K, 2.0);
-    double a = 1.0 + (V0 * K) / Q + pow(K, 2.0);
-    double b = 2.0 * (pow(K, 2.0) - 1.0);
-    double g = 1.0 - (V0 * K) / Q + pow(K, 2.0);
-    double d = 1.0 - K / Q + pow(K, 2.0);
-    a0 = a / d0;
-    a1 = b / d0;
-    a2 = g / d0;
-    b1 = b / d0;
-    b2 = d / d0;
+    if (flag == 1)
+    {
+        double K = 2.0 * pi * fc / fs;
+        double V0 = pow(10.0, gain_db / 20.0);
+        double d0 = 1.0 + K / Q + pow(K, 2.0);
+        double a = 1.0 + (V0 * K) / Q + pow(K, 2.0);
+        double b = 2.0 * (pow(K, 2.0) - 1.0);
+        double g = 1.0 - (V0 * K) / Q + pow(K, 2.0);
+        double d = 1.0 - K / Q + pow(K, 2.0);
+        a0 = a / d0;
+        a1 = b / d0;
+        a2 = g / d0;
+        b1 = b / d0;
+        b2 = d / d0;
+    }
+
+    else if (flag == 2)
+    {
+        double mid_K = 2.0 * pi * fc / fs;
+        double mid_V0 = pow(10.0, gain_db / 20.0);
+        double mid_d0 = 1.0 + mid_K / Q + pow(mid_K, 2.0);
+        double mid_a = 1.0 + (mid_V0 * mid_K) / Q + pow(mid_K, 2.0);
+        double mid_b = 2.0 * (pow(mid_K, 2.0) - 1.0);
+        double mid_g = 1.0 - (mid_V0 * mid_K) / Q + pow(mid_K, 2.0);
+        double mid_d = 1.0 - mid_K / Q + pow(mid_K, 2.0);
+        mid_a0 = mid_a / mid_d0;
+        mid_a1 = mid_b / mid_d0;
+        mid_a2 = mid_g / mid_d0;
+        mid_b1 = mid_b / mid_d0;
+        mid_b2 = mid_d / mid_d0;
+    }
+    else if (flag == 3)
+    {
+        // Calculate lowEQ coefficients
+        double low_K = 2.0 * pi * fc / fs;
+        double low_V0 = pow(10.0, gain_db / 20.0);
+        double low_d0 = 1.0 + low_K / Q + pow(low_K, 2.0);
+        double low_a = 1.0 + (low_V0 * low_K) / Q + pow(low_K, 2.0);
+        double low_b = 2.0 * (pow(low_K, 2.0) - 1.0);
+        double low_g = 1.0 - (low_V0 * low_K) / Q + pow(low_K, 2.0);
+        double low_d = 1.0 - low_K / Q + pow(low_K, 2.0);
+        low_a0 = low_a / low_d0;
+        low_a1 = low_b / low_d0;
+        low_a2 = low_g / low_d0;
+        low_b1 = low_b / low_d0;
+        low_b2 = low_d / low_d0;
+    }
+
+   
+
 }
 
 //Holds the Session info, this information is passed to the CreateDocument function which writes the txt file which saves its information. 
@@ -343,3 +430,33 @@ Fl_Window* mainWindow();
 void updateTime(void*);
 
 double tapeSaturationFunction(double in, double alpha);
+
+unsigned int bufferSize = 256;  
+double decay = 0.7;  
+
+class Reverb
+{
+public:
+    std::vector<double> buffer;
+    unsigned int bufferSize;
+    unsigned int bufferIndex;
+    double decay;
+
+    Reverb(unsigned int bufferSize, double decay) : bufferSize(bufferSize), decay(decay), bufferIndex(0) {
+        buffer.resize(bufferSize, 0.0);
+    }
+
+    double processSample(double input) {
+        double output = buffer[bufferIndex];
+        buffer[bufferIndex] = input + decay * output;
+        bufferIndex = (bufferIndex + 1) % bufferSize;
+
+        // Apply volume reduction
+        output *= 0.25;  // -12 dB gain reduction (0.25 is the corresponding gain factor)
+
+        return output;
+    }
+};
+
+
+Reverb reverb(bufferSize, decay);

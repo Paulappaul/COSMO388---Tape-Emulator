@@ -17,9 +17,6 @@ void exitCallback()
 }
 
 
-
-
-
 int main(int argc, char* argv[])
 {
     sessionSetup();

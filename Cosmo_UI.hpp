@@ -22,47 +22,49 @@ public:
 
 //HIGH EQ CONTROL
 
-void setHighFrequencySweep(double freq)
+void setHighFrequencySweep(double freq, int channel)
 {
-    High_fc = freq;
-    std::cout << "freq: " << High_fc << std::endl;
+    DialData.High_fc[channel] = freq;
+        
+    std::cout << "freq: " << DialData.High_fc[channel] << std::endl;
 }
 
 
 
-void highEqCallback(Fl_Widget* widget, void*)
+void highEqCallback(Fl_Widget* widget, void* userData)
 {
+    int channel = reinterpret_cast<int>(userData);
 
     Fl_Dial* dial = dynamic_cast<Fl_Dial*>(widget);
     if (dial)
     {
         double frequency = dial->value();  // Get the dial value
-        std::cout << "dial freq = " << dial->value() << std::endl;
+        std::cout << "dial freq @ " << channel << " is :" << dial->value() << std::endl;
         // Apply the frequency sweep parameter to the applyHighFilter function
-        setHighFrequencySweep(frequency);
+        setHighFrequencySweep(frequency, channel);
     }
 
 
 }
 
-void setHighGain(double gain)
+void setHighGain(double gain, int channel)
 {
-    High_gain_db = gain;
-    std::cout << "dial gain: " << High_gain_db << std::endl;
+    DialData.High_gain_db[channel] = gain;
+    std::cout << "dial gain: " << DialData.High_gain_db[channel] << std::endl;
 }
 
 
 
-void highGainCallback(Fl_Widget* widget, void*)
+void highGainCallback(Fl_Widget* widget, void* userData)
 {
-
+    int channel = reinterpret_cast<int>(userData);
     Fl_Dial* dial = dynamic_cast<Fl_Dial*>(widget);
     if (dial)
     {
         double frequency = dial->value();  // Get the dial value
-        std::cout << "dial Gain = " << dial->value() << std::endl;
+        std::cout << "dial Gain @ channel: "<< channel<< " is: " << dial->value() << std::endl;
         // Apply the frequency sweep parameter to the applyHighFilter function
-        setHighGain(frequency);
+        setHighGain(frequency, channel);
     }
 
 
@@ -74,47 +76,47 @@ void highGainCallback(Fl_Widget* widget, void*)
 
 //MID EQ
 
-void setMidFrequencySweep(double freq)
+void setMidFrequencySweep(double freq, int channel)
 {
-    Mid_fc = freq;
-    std::cout << "MID freq: " << Mid_fc << std::endl;
+    DialData.Mid_fc[channel] = freq;
+    std::cout << "MID freq: " << DialData.Mid_fc[channel] << std::endl;
 }
 
 
 
-void midEqCallback(Fl_Widget* widget, void*)
+void midEqCallback(Fl_Widget* widget, void* userData)
 {
-
+    int channel = reinterpret_cast<int>(userData);
     Fl_Dial* dial = dynamic_cast<Fl_Dial*>(widget);
     if (dial)
     {
         double frequency = dial->value();  // Get the dial value
-        std::cout << "MID dial freq = " << dial->value() << std::endl;
+        std::cout << "MID dial freq @ channel: " << channel << " is " << dial->value() << std::endl;
         // Apply the frequency sweep parameter to the applyHighFilter function
-        setMidFrequencySweep(frequency);
+        setMidFrequencySweep(frequency, channel);
     }
 
 
 }
 
-void setMidGain(double gain)
+void setMidGain(double gain, int channel)
 {
-    Mid_gain_db = gain;
-    std::cout << "MID dial gain: " << Mid_gain_db << std::endl;
+    DialData.Mid_gain_db[channel] = gain;
+    std::cout << "MID dial gain: " << DialData.Mid_gain_db[channel] << std::endl;
 }
 
 
 
-void midGainCallback(Fl_Widget* widget, void*)
+void midGainCallback(Fl_Widget* widget, void* userData)
 {
-
+    int channel = reinterpret_cast<int>(userData);
     Fl_Dial* dial = dynamic_cast<Fl_Dial*>(widget);
     if (dial)
     {
         double frequency = dial->value();  // Get the dial value
-        std::cout << "MID dial Gain = " << dial->value() << std::endl;
+        std::cout << "MID dial gain @ channel: " << channel << " is " << dial->value() << std::endl;
         // Apply the frequency sweep parameter to the applyHighFilter function
-        setMidGain(frequency);
+        setMidGain(frequency, channel);
     }
 
 
@@ -126,47 +128,47 @@ void midGainCallback(Fl_Widget* widget, void*)
 
 //LOW EQ
 
-void setLowFrequencySweep(double freq)
+void setLowFrequencySweep(double freq, int channel)
 {
-    Low_fc = freq;
-    std::cout << "LOW freq: " << Low_fc << std::endl;
+    DialData.Low_fc[channel] = freq;
+    std::cout << "LOW freq: " << DialData.Low_fc[channel] << std::endl;
 }
 
 
 
-void LowEqCallback(Fl_Widget* widget, void*)
+void LowEqCallback(Fl_Widget* widget, void* userData)
 {
-
+    int channel = reinterpret_cast<int>(userData);
     Fl_Dial* dial = dynamic_cast<Fl_Dial*>(widget);
     if (dial)
     {
         double frequency = dial->value();  // Get the dial value
-        std::cout << "LOW dial freq = " << dial->value() << std::endl;
+        std::cout << "LOW dial freq @ channel: " << channel << " is " << dial->value() << std::endl;
         // Apply the frequency sweep parameter to the applyHighFilter function
-        setLowFrequencySweep(frequency);
+        setLowFrequencySweep(frequency, channel);
     }
 
 
 }
 
-void setLowGain(double gain)
+void setLowGain(double gain, int channel)
 {
-    Low_gain_db = gain;
-    std::cout << "LOW dial gain: " << Low_gain_db << std::endl;
+    DialData.Low_gain_db[channel] = gain;
+    std::cout << "LOW dial gain: " << DialData.Low_gain_db[channel] << std::endl;
 }
 
 
 
-void lowGainCallback(Fl_Widget* widget, void*)
+void lowGainCallback(Fl_Widget* widget, void* userData)
 {
-
+    int channel = reinterpret_cast<int>(userData);
     Fl_Dial* dial = dynamic_cast<Fl_Dial*>(widget);
     if (dial)
     {
         double frequency = dial->value();  // Get the dial value
-        std::cout << "LOW dial Gain = " << dial->value() << std::endl;
+        std::cout << "LOW dial gain @ channel: " << channel << " is " << dial->value() << std::endl;
         // Apply the frequency sweep parameter to the applyHighFilter function
-        setLowGain(frequency);
+        setLowGain(frequency, channel);
     }
 
 
@@ -176,10 +178,9 @@ void lowGainCallback(Fl_Widget* widget, void*)
 
 
 
-void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
-
+void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor, int channel)
 {
-
+    void* userData = reinterpret_cast<void*>(channel);
 
     EQGroup* groupName = new EQGroup(x, y, w, h);
     groupName->begin();
@@ -200,10 +201,10 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
     {
         //high
         EqLow1->range(2500, 15000);
-        EqLow1->callback(highEqCallback);
+        EqLow1->callback(highEqCallback, userData);
         EqQ->color(fl_rgb_color(237, 73, 36));
         EqQ->range(-15, 15);
-        EqQ->callback(highGainCallback);
+        EqQ->callback(highGainCallback, userData);
 
     }
     else if (HighDialColor == 2)
@@ -212,9 +213,9 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
 
         EqQ->color(fl_rgb_color(253, 187, 91));
         EqLow1->range(500, 5000);
-        EqLow1->callback(midEqCallback);
+        EqLow1->callback(midEqCallback, userData);
         EqQ->range(-15, 15);
-        EqQ->callback(midGainCallback);
+        EqQ->callback(midGainCallback, userData);
 
     }
     else if (HighDialColor == 3)
@@ -222,9 +223,9 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor)
         //low
         EqQ->color(fl_rgb_color(245,255,118));
         EqLow1->range(50, 1000);
-        EqLow1->callback(LowEqCallback);
+        EqLow1->callback(LowEqCallback, userData);
         EqQ->range(-15, 15);
-        EqQ->callback(lowGainCallback);
+        EqQ->callback(lowGainCallback, userData);
     }
 
     EqQ->value(0.55);
@@ -246,6 +247,14 @@ void saturationDialCallback(Fl_Widget* widget, void* userData)
 
 }
 
+void reverbDialCallback(Fl_Widget* widget, void* userData)
+{
+    Fl_Dial* reverbDial = dynamic_cast<Fl_Dial*>(widget);
+    reverb.decay = reverbDial->value();
+    std::cout << "reverbDial value: " << reverb.decay << std::endl;
+}
+
+
 void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG, int channel)
 {
 
@@ -261,7 +270,9 @@ void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG, int channel)
     Send2_1->type(FL_LINE_DIAL);
     Send1_1->bounds(0.0, 10.0);
 
+    Send2_1->bounds(0.0, 1.0);
     Send1_1->callback(saturationDialCallback, static_cast<void*>(channelPtr));
+   // Send2_1->callback(reverbDialCallback, static_cast<void*>(channelPtr));
 
 }
 
@@ -952,59 +963,59 @@ Fl_Window* mainWindow()
     Column1->image(columnTest);
     Column1->type(FL_FLAT_BOX);
     Column1->color(fl_rgb_color(233, 234, 230));;
-    EQDials(55, 110, 85, 85, 0, 1);
-    EQDials(55, 207, 85, 85, 0, 2);
-    EQDials(55, 305, 85, 85, 0, 3);
+    EQDials(55, 110, 85, 85, 0, 1, 0);
+    EQDials(55, 207, 85, 85, 0, 2, 0);
+    EQDials(55, 305, 85, 85, 0, 3, 0);
 
     //Column2 
     Fl_Box* Column2 = new Fl_Box(FL_FLAT_BOX, 200, 90, 95, 325, 0);
     Column2->image(columnTest);
-    EQDials(205, 110, 85, 85, 0, 1);
-    EQDials(205, 207, 85, 85, 0, 2);
-    EQDials(205, 305, 85, 85, 0, 3);
+    EQDials(205, 110, 85, 85, 0, 1, 1);
+    EQDials(205, 207, 85, 85, 0, 2, 1);
+    EQDials(205, 305, 85, 85, 0, 3, 1);
 
     //Column3
 
     Fl_Box* Column3 = new Fl_Box(FL_FLAT_BOX, 350, 90, 95, 325, 0);
     Column3->image(columnTest);
-    EQDials(355, 110, 85, 85, 0, 1);
-    EQDials(355, 207, 85, 85, 0, 2);
-    EQDials(355, 305, 85, 85, 0, 3);
+    EQDials(355, 110, 85, 85, 0, 1 ,2);
+    EQDials(355, 207, 85, 85, 0, 2, 2);
+    EQDials(355, 305, 85, 85, 0, 3 ,2);
 
     //Column4
     Fl_Box* Column4 = new Fl_Box(FL_FLAT_BOX, 500, 90, 95, 325, 0);
     Column4->image(columnTest);
-    EQDials(505, 110, 85, 85, 0, 1);
-    EQDials(505, 207, 85, 85, 0, 2);
-    EQDials(505, 305, 85, 85, 0, 3);
+    EQDials(505, 110, 85, 85, 0, 1, 3);
+    EQDials(505, 207, 85, 85, 0, 2, 3);
+    EQDials(505, 305, 85, 85, 0, 3, 3);
 
     //Column5
     Fl_Box* Column5 = new Fl_Box(FL_FLAT_BOX, 650, 90, 95, 325, 0);
     Column5->image(columnTest);
-    EQDials(655, 110, 85, 85, 0, 1);
-    EQDials(655, 207, 85, 85, 0, 2);
-    EQDials(655, 305, 85, 85, 0, 3);
+    EQDials(655, 110, 85, 85, 0, 1, 4);
+    EQDials(655, 207, 85, 85, 0, 2, 4);
+    EQDials(655, 305, 85, 85, 0, 3, 4);
 
     //Column6
     Fl_Box* Column6 = new Fl_Box(FL_FLAT_BOX, 800, 90, 95, 325, 0);
     Column6->image(columnTest);
-    EQDials(805, 110, 85, 85, 0, 1);
-    EQDials(805, 207, 85, 85, 0, 2);
-    EQDials(805, 305, 85, 85, 0, 3);
+    EQDials(805, 110, 85, 85, 0, 1 ,5);
+    EQDials(805, 207, 85, 85, 0, 2, 5);
+    EQDials(805, 305, 85, 85, 0, 3, 5);
 
     //Column7
     Fl_Box* Column7 = new Fl_Box(FL_FLAT_BOX, 950, 90, 95, 325, 0);
     Column7->image(columnTest);
-    EQDials(955, 110, 85, 85, 0, 1);
-    EQDials(955, 207, 85, 85, 0, 2);
-    EQDials(955, 305, 85, 85, 0, 3);
+    EQDials(955, 110, 85, 85, 0, 1, 6);
+    EQDials(955, 207, 85, 85, 0, 2, 6);
+    EQDials(955, 305, 85, 85, 0, 3, 6);
 
     //Column8
     Fl_Box* Column8 = new Fl_Box(FL_FLAT_BOX, 1100, 90, 95, 325, 0);
     Column8->image(columnTest);
-    EQDials(1105, 110, 85, 85, 0, 1);
-    EQDials(1105, 207, 85, 85, 0, 2);
-    EQDials(1105, 305, 85, 85, 0, 3);
+    EQDials(1105, 110, 85, 85, 0, 1, 7);
+    EQDials(1105, 207, 85, 85, 0, 2, 7);
+    EQDials(1105, 305, 85, 85, 0, 3, 7);
 
     Fl_PNG_Image* SendBG = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\eqdial.png");
 
