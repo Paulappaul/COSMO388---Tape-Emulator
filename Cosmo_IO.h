@@ -116,7 +116,7 @@ void playbackThread(const std::string& filePath, unsigned long startTime, unsign
 }
 
 //This functions as a net, its catch must be passed to a struct. 
-static int callBack1
+static int recordCallBack
 (const void* input,
     void* output,
     unsigned long frameCount,
@@ -333,10 +333,7 @@ void terminate(PaError& err)
     else { std::cout << "PA already termianted" << std::endl; }
 }
 
-//A struct which holds Device information
-const   PaDeviceInfo* deviceInfo;
 
-int inputDebug = 0; // remove when certain
 
 void deviceChoiceButtonCallback(Fl_Widget* widget, void* data)
 {
@@ -352,12 +349,10 @@ void deviceChoiceButtonCallback(Fl_Widget* widget, void* data)
     inputParameters.channelCount = 1;
     ChannelNum = 1;
     Fl_Window* dialog = static_cast<Fl_Window*>(inputChoice->parent());
-    inputDebug = selectedInputDevice;
     dialog->hide();
 
 }
 
-int outputDebug = 0; //remove the certain
 
 void outputChoiceButtonCallback(Fl_Widget* widget, void* data)
 {
@@ -373,7 +368,6 @@ void outputChoiceButtonCallback(Fl_Widget* widget, void* data)
     outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
     sRate = 44100;
     Fl_Window* dialog = static_cast<Fl_Window*>(outputChoice->parent());
-    outputDebug = selectedOutputDevice;
     dialog->hide();
 
 }
@@ -441,26 +435,6 @@ void StreamSetup(PaError& err)
         Fl::wait();
     }
 
-    deviceInfo = Pa_GetDeviceInfo(inputDebug);
-    std::cout << "NAME: " << deviceInfo->name << " SAMPLE RATE: "
-        << deviceInfo->defaultSampleRate << " Max Input Channels: "
-        << deviceInfo->maxInputChannels << " Max Output Channels: "
-        << deviceInfo->maxOutputChannels << "input latency: "
-        << deviceInfo->defaultLowInputLatency << "output latency: "
-        << deviceInfo->defaultLowOutputLatency <<
-        std::endl;
-
-    //handle Outputs
-
-
-    deviceInfo = Pa_GetDeviceInfo(outputDebug);
-    std::cout << "NAME: " << deviceInfo->name << " SAMPLE RATE: "
-        << deviceInfo->defaultSampleRate << " Max Input Channels: "
-        << deviceInfo->maxInputChannels << " Max Output Channels: "
-        << deviceInfo->maxOutputChannels << "input latency: "
-        << deviceInfo->defaultLowInputLatency << "output latency: "
-        << deviceInfo->defaultLowOutputLatency <<
-        std::endl;
 
 
     
@@ -483,7 +457,7 @@ void openStream(dataBuffer& datapass, PaError& err)
         sRate,
         framesPerBuffer,
         paNoFlag,
-        &callBack1,
+        &recordCallBack,
         &datapass
     );
 

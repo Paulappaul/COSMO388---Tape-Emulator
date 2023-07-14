@@ -239,28 +239,29 @@ void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor, in
 
 void saturationDialCallback(Fl_Widget* widget, void* userData) 
 {
-    int* dialChannel = static_cast<int*>(userData);
-    Fl_Dial* saturationDial = dynamic_cast<Fl_Dial*>(widget);
-    DialData.saturationGain[*dialChannel] = saturationDial->value();
+    int channel = reinterpret_cast<int>(userData);
 
-    std::cout << "dial at: " << *dialChannel << " is: " << DialData.saturationGain[*dialChannel];
+    Fl_Dial* saturationDial = dynamic_cast<Fl_Dial*>(widget);
+    DialData.saturationGain[channel] = saturationDial->value();
+
+    std::cout << "dial at: " << channel << " is: " << DialData.saturationGain[channel];
 
 }
 
 void reverbDialCallback(Fl_Widget* widget, void* userData)
 {
     Fl_Dial* reverbDial = dynamic_cast<Fl_Dial*>(widget);
-    int* channel = static_cast<int*>(userData);
+    int channel = reinterpret_cast<int>(userData);
 
-    reverb.volume[*channel] = reverbDial->value();
-    std::cout << "reverbDial value: " << reverb.volume[*channel] << std::endl;
+    reverb.volume[channel] = reverbDial->value();
+    std::cout << "reverbDial value: " << reverb.volume[channel] << std::endl;
 }
 
 
 void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG, int channel)
 {
-
-    int* channelPtr = new int(channel);
+    void* Channel = reinterpret_cast<void*>(channel);
+  
 
     Fl_Box* SendBox = new Fl_Box(FL_FLAT_BOX, x - 10, y - 10, 95, 200, 0);
     SendBox->image(SendBG);
@@ -273,8 +274,8 @@ void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG, int channel)
     Send1_1->bounds(0.0, 10.0);
     Send2_1->bounds(0.0, 1.0);
     Send2_1->value(0);
-    Send1_1->callback(saturationDialCallback, static_cast<void*>(channelPtr));
-    Send2_1->callback(reverbDialCallback, static_cast<void*>(channelPtr));
+    Send1_1->callback(saturationDialCallback, Channel);
+    Send2_1->callback(reverbDialCallback, Channel);
 
 }
 
@@ -436,28 +437,29 @@ void choiceButtonCallback(Fl_Widget* widget, void* data)
 
 void recPlayCallback(Fl_Widget* widget, void* data)
 {
+    int channel = reinterpret_cast<int>(data);
     /*The dynamic cast is a casting operation that can be used to convert pointers or references of a base class to pointers or references
     of a derived class, or vice versa, at runtime.*/
 
     Fl_Slider* REC_PLAY = dynamic_cast<Fl_Slider*>(widget);
-    int* channel = static_cast<int*>(data);
+    
 
 
     if (REC_PLAY->value() == 0)
     {
-        std::cout << "playback enabled for: " << *channel << std::endl;
-        project.recPlayBackState[*channel] = false;
-        std::cout << "PROJECT_SESSION_BOOL STATE: " << project.recPlayBackState[*channel] << std::endl;
-        std::cout << "CHANNEL LOCATION: " << project.channelLocations[*channel] << std::endl;
+        std::cout << "playback enabled for: " << channel << std::endl;
+        project.recPlayBackState[channel] = false;
+        std::cout << "PROJECT_SESSION_BOOL STATE: " << project.recPlayBackState[channel] << std::endl;
+        std::cout << "CHANNEL LOCATION: " << project.channelLocations[channel] << std::endl;
 
     }
 
     else if (REC_PLAY->value() == 1)
     {
 
-        std::cout << "REC enabled for: " << *channel << std::endl;
-        project.recPlayBackState[*channel] = true;
-        std::cout << "PROJECT_SESSION_BOOL STATE FOR CHANNEL: " << *channel << " is " << project.recPlayBackState[*channel] << std::endl;
+        std::cout << "REC enabled for: " << channel << std::endl;
+        project.recPlayBackState[channel] = true;
+        std::cout << "PROJECT_SESSION_BOOL STATE FOR CHANNEL: " << channel << " is " << project.recPlayBackState[channel] << std::endl;
     }
 
 }
@@ -466,7 +468,8 @@ void recPlayCallback(Fl_Widget* widget, void* data)
 void createRecPlaySlider(int channel, const char* name, int x, int y, int w, int h) 
 {
  
-    int* channelPtr = new int(channel);
+    void* channelPtr = reinterpret_cast<void*>(channel);
+
 
     Fl_Slider* REC_PLAY = new Fl_Slider(x, y, w, h);
     REC_PLAY->type(FL_VERT_NICE_SLIDER);
@@ -475,7 +478,7 @@ void createRecPlaySlider(int channel, const char* name, int x, int y, int w, int
     REC_PLAY->step(1.0);
     REC_PLAY->value(0);
 
-    REC_PLAY->callback(recPlayCallback, static_cast<void*>(channelPtr));
+    REC_PLAY->callback(recPlayCallback, channelPtr);
 
 }
 

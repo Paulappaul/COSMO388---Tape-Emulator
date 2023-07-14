@@ -65,21 +65,6 @@ int ChannelNum = 0;
 double sRate = 44100;
 const double pi = 3.14159265358979323846;
 
-//High
-double High_gain_db = 0; // Set the gain in dB
-double High_Q = 2.0; // Set the quality factor
-int High_fc = 0; // Set the center frequency
-
-//Mid
-double Mid_gain_db = 0; // Set the gain in dB
-double Mid_Q = 2.0; // Set the quality factor
-int Mid_fc = 0; // Set the center frequency
-
-//Low
-double Low_gain_db = 0; // Set the gain in dB
-double Low_Q = 2.0; // Set the quality factor
-int Low_fc = 0; // Set the center frequency
-
 //Cosmo_TIME
 int hour = 0;
 int minute = 0;
@@ -258,7 +243,40 @@ void dataBuffer::calculateBoostCofficients(double gain_db, double Q, int fc, int
 
 }
 
-//Holds the Session info, this information is passed to the CreateDocument function which writes the txt file which saves its information. 
+//Stores the Reverb Dial values (which controls the amplitude of the reverb) 
+//larger buffers allow for longer decays.
+class Reverb
+{
+public:
+    std::vector<double> buffer;
+    unsigned int bufferSize;
+    unsigned int bufferIndex;
+    double decay;
+    double volume[7] = { 0, 0, 0, 0, 0, 0, 0 };
+
+    Reverb(unsigned int bufferSize, double decay) : bufferSize(bufferSize), decay(decay), bufferIndex(0), volume()
+    {
+        buffer.resize(bufferSize, 0.0);
+
+    }
+
+    double processSample(double input, int channel)
+    {
+        double output = buffer[bufferIndex];
+        buffer[bufferIndex] = input + decay * output;
+        bufferIndex = (bufferIndex + 1) % bufferSize;
+
+        // Volume Reduction from Dials
+        output *= volume[channel];
+
+        return output;
+    }
+};
+
+
+
+
+//Holds the Session info, this information is passed to the CreateDocument function which writes the txt file which saves its information. During the runtime lifetime, our SessionData is stored here.
 struct ProjectInfo
 {
     std::string projectName;
@@ -275,6 +293,7 @@ struct ProjectInfo
 
 };
 
+//This stores Frequency and Gain values from the FLTK Dials. DialData written by the Dials and read by the recordCallback. 
 struct dialData
 {
 
@@ -297,9 +316,16 @@ struct dialData
 
 };
 
+//Global Class Declaration. 
+
+//A PortAudio defined struct which holds the Audio Device information
+const   PaDeviceInfo* deviceInfo;
+
 ProjectInfo project;
 
 dialData DialData;
+
+Reverb reverb(10000, 1.0);
 
 
  /**********************************************************************************************COSMO I/O**************************************************************************************************/
@@ -316,15 +342,21 @@ void StreamSetup(PaError& err);
 /*Opens the Stream and runs the audio processing loop*/
 void openStream(dataBuffer& datapass, PaError& err);
 
+//All Playback is handled here. 
 static int playbackCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
     const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
     void* userData);
 
+//Playback async thread -> sets up playback callback
 void playbackThread(const std::string& filePath, unsigned long startTime, unsigned long endTime, int playbackChannel);
 
-static int callBack1(const void* input, void* output, unsigned long frameCount,
+//Recording and the EQ/saturation/Reverb processing is handled in this function.
+static int recordCallBack(const void* input, void* output, unsigned long frameCount,
     const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
     void* userData);
+
+//processes samples via the In value, returns a double that is the processed signal. Alpha value provided by the saturation Dial i-> amount of tape sat. 
+double tapeSaturationFunction(double in, double alpha);
 
 
 /*************************************************************************Convolution.h********************************************************************************/
@@ -333,10 +365,7 @@ static int callBack1(const void* input, void* output, unsigned long frameCount,
 void convolution(int channelName, int load);
 
 /*Writes the data contained in vector<float> recordedSamples; from the dataBuffer struct to a WAV file. The WAV file is stored in the RAW folder*/
-void WriteAudio(dataBuffer& datapass);
-
-//LEGACY CODE: 
-void readFile();
+void WriteAudio(dataBuffer& datapass, int channel2Write);
 
 //Vector which handles the WOW and Flutter Processing
 std::vector<double> WOW_and_FLUTTER_Function(const std::vector<double>& x, int SAMPLERATE, double Modfreq, double Width);
@@ -364,35 +393,39 @@ bool parseProjectInfo(const std::string& filePath, ProjectInfo& project);
 //Logic for Opening or Creating a Project
 void choiceButtonCallback(Fl_Widget* widget, void* data);
 
-void setHighFrequencySweep(double freq);
+/*The Send and EQ Dials store their states and values in the Dial Data struct. We pass the channel corrosponding to the dial into the "int channel" parameters of their constructor and
+callback functions. */
+
+//This creates the Dial Group which manages the EQ Dial hierarchy and draws the EQ dials to the Screen
+void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor, int channel);
+
+//automates the creation of the send dials. 
+void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG, int channel);
+
+void setHighFrequencySweep(double freq, int channel);
 
 void highEqCallback(Fl_Widget* widget, void*);
 
-void setHighGain(double gain);
+void setHighGain(double gain, int channel);
 
 void highGainCallback(Fl_Widget* widget, void*);
 
-void setMidFrequencySweep(double freq);
+void setMidFrequencySweep(double freq, int channel);
 
 void midEqCallback(Fl_Widget* widget, void*);
 
-void setMidGain(double gain);
+void setMidGain(double gain, int channel);
 
 void midGainCallback(Fl_Widget* widget, void*);
 
-void setLowFrequencySweep(double freq);
+void setLowFrequencySweep(double freq, int channel);
 
 void LowEqCallback(Fl_Widget* widget, void*);
 
-void setLowGain(double gain);
+void setLowGain(double gain, int channel);
 
 void lowGainCallback(Fl_Widget* widget, void*);
 
-//This creates the Dial Group which manages the EQ Dial hierarchy and draws the EQ dials to the Screen
-void EQDials(int x, int y, int w, int h, int LowDialColor, int HighDialColor);
- 
-//automates the creation of the send dials. 
-void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG);
 
 //TO DO: Should we call WriteAudio and Terminate here rather then at STOP? 
 //async thread calls the openStream function for Audio Recording. This is located in the record button callback. 
@@ -423,46 +456,21 @@ void createVolumeSlider(int x, int y, int w, int h, int channelNumber);
 //cleans up heap allocated memory
 void exitCallback();
 
+//Handles saturation amplitude for value "alpha" in the tape saturation function
+void saturationDialCallback(Fl_Widget* widget, void* userData);
+
+//Controls the reverb amplitude
+void reverbDialCallback(Fl_Widget* widget, void* userData);
+
 Fl_Window* mainWindow();
 
 /********************************************************COSMO_CLOCK.H*************************************************************/
 
 void updateTime(void*);
 
-double tapeSaturationFunction(double in, double alpha);
-
-//larger buffers allow for longer decays.
-unsigned int bufferSize = 10000;  
-double decay = 1.0;  
 
 
-class Reverb
-{
-public:
-    std::vector<double> buffer;
-    unsigned int bufferSize;
-    unsigned int bufferIndex;
-    double decay;
-    double volume[7] = {0, 0, 0, 0, 0, 0, 0};
-
-    Reverb(unsigned int bufferSize, double decay) : bufferSize(bufferSize), decay(decay), bufferIndex(0), volume()
-    {
-        buffer.resize(bufferSize, 0.0);
-      
-    }
-
-    double processSample(double input, int channel)
-    {
-        double output = buffer[bufferIndex];
-        buffer[bufferIndex] = input + decay * output;
-        bufferIndex = (bufferIndex + 1) % bufferSize;
-
-        // Volume Reduction from Dials
-        output *= volume[channel];  
-
-        return output;
-    }
-};
 
 
-Reverb reverb(bufferSize, decay);
+
+

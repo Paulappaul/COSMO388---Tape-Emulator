@@ -19,7 +19,7 @@ void exitCallback()
 
 int main(int argc, char* argv[])
 {
-    sessionSetup();
+   // sessionSetup();
     Fl_Window* mainWin = mainWindow();
 
     // Schedule the initial update after 1 second, for time Visual 
@@ -32,7 +32,3 @@ int main(int argc, char* argv[])
    return Fl::run();
    return 0;
 }
-
-
-
-
