@@ -431,8 +431,10 @@ void updateTime(void*);
 
 double tapeSaturationFunction(double in, double alpha);
 
-unsigned int bufferSize = 256;  
-double decay = 0.7;  
+//larger buffers allow for longer decays.
+unsigned int bufferSize = 10000;  
+double decay = 1.0;  
+
 
 class Reverb
 {
@@ -441,18 +443,22 @@ public:
     unsigned int bufferSize;
     unsigned int bufferIndex;
     double decay;
+    double volume[7] = {0, 0, 0, 0, 0, 0, 0};
 
-    Reverb(unsigned int bufferSize, double decay) : bufferSize(bufferSize), decay(decay), bufferIndex(0) {
+    Reverb(unsigned int bufferSize, double decay) : bufferSize(bufferSize), decay(decay), bufferIndex(0), volume()
+    {
         buffer.resize(bufferSize, 0.0);
+      
     }
 
-    double processSample(double input) {
+    double processSample(double input, int channel)
+    {
         double output = buffer[bufferIndex];
         buffer[bufferIndex] = input + decay * output;
         bufferIndex = (bufferIndex + 1) % bufferSize;
 
-        // Apply volume reduction
-        output *= 0.25;  // -12 dB gain reduction (0.25 is the corresponding gain factor)
+        // Volume Reduction from Dials
+        output *= volume[channel];  
 
         return output;
     }

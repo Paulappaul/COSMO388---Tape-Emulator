@@ -268,11 +268,11 @@ static int callBack1
             }
 
 
-
+            double final = y0 * 0.33 + z0 * 0.33 + Lz0 * 0.33;
 
             datapass->recordedSamples.push_back(y0 * 0.33 + z0 * 0.33 + Lz0 * 0.33);
 
-            outputSamples[i] = static_cast<float>(y0 * 0.33 + z0 * 0.33 + Lz0 * 0.33);
+            outputSamples[i] = static_cast<float>(y0 + tapeSaturationFunction(y0, DialData.saturationGain[datapass->dataChannel]) + reverb.processSample(y0, datapass->dataChannel));
 
 
         }

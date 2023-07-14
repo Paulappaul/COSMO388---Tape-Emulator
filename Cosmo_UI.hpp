@@ -250,8 +250,10 @@ void saturationDialCallback(Fl_Widget* widget, void* userData)
 void reverbDialCallback(Fl_Widget* widget, void* userData)
 {
     Fl_Dial* reverbDial = dynamic_cast<Fl_Dial*>(widget);
-    reverb.decay = reverbDial->value();
-    std::cout << "reverbDial value: " << reverb.decay << std::endl;
+    int* channel = static_cast<int*>(userData);
+
+    reverb.volume[*channel] = reverbDial->value();
+    std::cout << "reverbDial value: " << reverb.volume[*channel] << std::endl;
 }
 
 
@@ -269,10 +271,10 @@ void Send_Dials(int x, int y, int w, int h, Fl_PNG_Image* SendBG, int channel)
     Send1_1->type(FL_LINE_DIAL);
     Send2_1->type(FL_LINE_DIAL);
     Send1_1->bounds(0.0, 10.0);
-
     Send2_1->bounds(0.0, 1.0);
+    Send2_1->value(0);
     Send1_1->callback(saturationDialCallback, static_cast<void*>(channelPtr));
-   // Send2_1->callback(reverbDialCallback, static_cast<void*>(channelPtr));
+    Send2_1->callback(reverbDialCallback, static_cast<void*>(channelPtr));
 
 }
 
