@@ -40,7 +40,7 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
 #include <FL/fl_draw.H>
-
+#include "FL/Fl_Counter.H"
 
 
 /*NAMESPACE*/
@@ -94,6 +94,8 @@ bool PAstatus = false;
 // Parameters for WOW and FLUTTER effect
 double wFdepth = 0.7;  // Example depth in milliseconds
 double wFrate = 0.002;   // Example rate in Hz
+
+Fl_Counter* timeCounter;
 
 /****************************************************************************************************STRUCTS***********************************************************************************************/
 
@@ -462,7 +464,7 @@ void saturationDialCallback(Fl_Widget* widget, void* userData);
 //Controls the reverb amplitude
 void reverbDialCallback(Fl_Widget* widget, void* userData);
 
-Fl_Window* mainWindow();
+Fl_Double_Window* mainWindow();
 
 /********************************************************COSMO_CLOCK.H*************************************************************/
 

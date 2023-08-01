@@ -477,6 +477,7 @@ void createRecPlaySlider(int channel, const char* name, int x, int y, int w, int
     REC_PLAY->range(0, 1);
     REC_PLAY->step(1.0);
     REC_PLAY->value(0);
+   
 
     REC_PLAY->callback(recPlayCallback, channelPtr);
 
@@ -799,6 +800,7 @@ void sliderVolumeCallback(Fl_Widget* widget, void* channelNumber)
     Fl_Slider* volumeSlider = dynamic_cast<Fl_Slider*>(widget);
     project.sliderVolume[(int)channelNumber] = volumeSlider->value();
     std::cout << "Project Value = " << project.sliderVolume[(int)channelNumber] << std::endl;
+    Fl::redraw();
 
 
 }
@@ -809,6 +811,9 @@ void createVolumeSlider(int x, int y, int w, int h, int channelNumber)
     volumeSlider->type(FL_VERT_NICE_SLIDER);
     volumeSlider->bounds(1.0, 0);
     volumeSlider->slider_size(0.05);
+    volumeSlider->box(FL_THIN_UP_FRAME);
+    //volumeSlider->slider(FL_NO_BOX);
+
     volumeSlider->callback(sliderVolumeCallback, (void*) channelNumber);
 
 }
@@ -845,11 +850,11 @@ void sessionSetup()
 
 }
 
-
-Fl_Window* mainWindow()
+Fl_Double_Window* mainWindow()
 {
+    Fl_Double_Window* window = new Fl_Double_Window(1800, 1000, "Cosmo38");
 
-    Fl_Window* window = new Fl_Window(1800, 1000, "Cosmo38");
+
     Fl_PNG_Image* windowImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\Background.png");
     Fl_Box* imagebox = new Fl_Box(0, 0, 1800, 1000);
     imagebox->image(windowImage);
@@ -857,25 +862,29 @@ Fl_Window* mainWindow()
 
 
     //Time
-    TimeBox* timeBox = new TimeBox(1410, 430, 200, 100);
+    TimeBox* timeBox = new TimeBox(1290, 460, 400, 100);
     timeBox->box(FL_UP_BOX);
     timeBox->labelsize(24);
     timeBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+   timeBox->color(FL_BLACK);
    // timeBox->type(FL_OVAL_BOX);
- 
+    timeBox->labelcolor(FL_DARK_GREEN);
+    timeBox->labelfont(FL_SCREEN_BOLD);
+
+
     //Logo
-    Fl_PNG_Image* logoImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\cosmo388.png");
+   // Fl_PNG_Image* logoImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\cosmo388.png");
     Fl_Box* logo = new Fl_Box(1460, 5, 100, 80);
-    logo->image(logoImage);
+   // logo->image(logoImage);
 
 
 
     //Transport Display
-    Fl_Button* Play = new Fl_Button(1410, 770, 100, 100);
-    Fl_Button* Rewind = new Fl_Button(1310, 770, 100, 100);
-    Fl_Button* Stop = new Fl_Button(1510, 770, 100, 100);
-    Fl_Button* FastForward = new Fl_Button(1610, 770, 100, 100);
-    Fl_Button* recordButton = new Fl_Button(1410, 670, 200, 100, "@circle");
+    Fl_Button* Play = new Fl_Button(1390, 800, 100, 100);
+    Fl_Button* Rewind = new Fl_Button(1290, 800, 100, 100);
+    Fl_Button* Stop = new Fl_Button(1490, 800, 100, 100);
+    Fl_Button* FastForward = new Fl_Button(1590, 800, 100, 100);
+    Fl_Button* recordButton = new Fl_Button(1390, 700, 200, 100, "@circle");
 
     TransportButtons* transportButtons = new TransportButtons(Play, FastForward, Rewind, recordButton);
 
@@ -897,21 +906,21 @@ Fl_Window* mainWindow()
     
     // Record or Playback Sliders
 
-    createRecPlaySlider(0, "1", 1260, 540, 35, 100);
-    createRecPlaySlider(1, "2", 1326, 540, 35, 100);
-    createRecPlaySlider(2, "3", 1392, 540, 35, 100);
-    createRecPlaySlider(3, "4", 1458, 540, 35, 100);
-    createRecPlaySlider(4, "5", 1524, 540, 35, 100);
-    createRecPlaySlider(5, "6", 1590, 540, 35, 100);
-    createRecPlaySlider(6, "7", 1655, 540, 35, 100);
-    createRecPlaySlider(7, "8", 1720, 540, 35, 100);
+    createRecPlaySlider(0, "1", 1240, 570, 35, 100);
+    createRecPlaySlider(1, "2", 1306, 570, 35, 100);
+    createRecPlaySlider(2, "3", 1372, 570, 35, 100);
+    createRecPlaySlider(3, "4", 1438, 570, 35, 100);
+    createRecPlaySlider(4, "5", 1504, 570, 35, 100);
+    createRecPlaySlider(5, "6", 1570, 570, 35, 100);
+    createRecPlaySlider(6, "7", 1635, 570, 35, 100);
+    createRecPlaySlider(7, "8", 1700, 570, 35, 100);
 
     //Load and Save Button
-    Fl_Button* loadButton = new Fl_Button(1310, 670, 100, 100);
+    Fl_Button* loadButton = new Fl_Button(1290, 700, 100, 100);
     loadButton->label("@fileopen");
     loadButton->callback(loadButtonCallback);
 
-    Fl_Button* saveButton = new Fl_Button(1610, 670, 100, 100);
+    Fl_Button* saveButton = new Fl_Button(1590, 700, 100, 100);
     saveButton->label("@filesave");
     saveButton->callback(saveButtonCallback);
 
@@ -928,14 +937,15 @@ Fl_Window* mainWindow()
     }
 
     // VU Meters
-    Fl_Box* channel1 = new Fl_Box(0, 0, 200, 90, 0);
-    Fl_Box* channel2 = new Fl_Box(0, 0, 500, 90, 0);
-    Fl_Box* channel3 = new Fl_Box(0, 0, 800, 90, 0);
-    Fl_Box* channel4 = new Fl_Box(0, 0, 1100, 90, 0);
-    Fl_Box* channel5 = new Fl_Box(0, 0, 1400, 90, 0);
-    Fl_Box* channel6 = new Fl_Box(0, 0, 1700, 90, 0);
-    Fl_Box* channel7 = new Fl_Box(0, 0, 2000, 90, 0);
-    Fl_Box* channel8 = new Fl_Box(0, 0, 2300, 90, 0);
+    Fl_Box* channel1 = new Fl_Box(0, 0, 200,  130, 0);
+    Fl_Box* channel2 = new Fl_Box(0, 0, 500,  130, 0);
+    Fl_Box* channel3 = new Fl_Box(0, 0, 800,  130, 0);
+    Fl_Box* channel4 = new Fl_Box(0, 0, 1100, 130, 0);
+    Fl_Box* channel5 = new Fl_Box(0, 0, 1400, 130, 0);
+    Fl_Box* channel6 = new Fl_Box(0, 0, 1700, 130, 0);
+    Fl_Box* channel7 = new Fl_Box(0, 0, 2000, 130, 0);
+    Fl_Box* channel8 = new Fl_Box(0, 0, 2300, 130, 0);
+
     Fl_Box* Reel2Reel = new Fl_Box(0, 0, 3015, 500, 0);
 
     channel1->image(pngImage);
@@ -946,93 +956,93 @@ Fl_Window* mainWindow()
     channel6->image(pngImage);
     channel7->image(pngImage);
     channel8->image(pngImage);
-    Reel2Reel->image(reelImage);
+  //  Reel2Reel->image(reelImage);
 
   
 
-    createVolumeSlider(30, 670, 136, 300, 1);
-    createVolumeSlider(180, 670, 136, 300, 2);
-    createVolumeSlider(330, 670, 136, 300, 3);
-    createVolumeSlider(480, 670, 136, 300, 4);
-    createVolumeSlider(630, 670, 136, 300, 5);
-    createVolumeSlider(780, 670, 136, 300, 6);
-    createVolumeSlider(930, 670, 136, 300, 7);
-    createVolumeSlider(1080,670, 136, 300, 8);
+    createVolumeSlider(30, 680, 136, 300, 1);
+    createVolumeSlider(180, 680, 136, 300, 2);
+    createVolumeSlider(330, 680, 136, 300, 3);
+    createVolumeSlider(480, 680, 136, 300, 4);
+    createVolumeSlider(630, 680, 136, 300, 5);
+    createVolumeSlider(780, 680, 136, 300, 6);
+    createVolumeSlider(930, 680, 136, 300, 7);
+    createVolumeSlider(1080,680, 136, 300, 8);
 
     
 
 
     //Column1
     Fl_PNG_Image* columnTest = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\dial.png");
-    Fl_Box* Column1 = new Fl_Box(FL_FLAT_BOX, 50, 90, 95, 325, 0);
+    Fl_Box* Column1 = new Fl_Box(FL_FLAT_BOX, 52, 105, 95, 325, 0);
     Column1->image(columnTest);
     Column1->type(FL_FLAT_BOX);
     Column1->color(fl_rgb_color(233, 234, 230));;
-    EQDials(55, 110, 85, 85, 0, 1, 0);
-    EQDials(55, 207, 85, 85, 0, 2, 0);
-    EQDials(55, 305, 85, 85, 0, 3, 0);
+    EQDials(57, 125, 85, 85, 0, 1, 0);
+    EQDials(57, 222, 85, 85, 0, 2, 0);
+    EQDials(57, 320, 85, 85, 0, 3, 0);
 
     //Column2 
-    Fl_Box* Column2 = new Fl_Box(FL_FLAT_BOX, 200, 90, 95, 325, 0);
+    Fl_Box* Column2 = new Fl_Box(FL_FLAT_BOX, 202, 105, 95, 325, 0);
     Column2->image(columnTest);
-    EQDials(205, 110, 85, 85, 0, 1, 1);
-    EQDials(205, 207, 85, 85, 0, 2, 1);
-    EQDials(205, 305, 85, 85, 0, 3, 1);
+    EQDials(207, 125, 85, 85, 0, 1, 1);
+    EQDials(207, 222, 85, 85, 0, 2, 1);
+    EQDials(207, 320, 85, 85, 0, 3, 1);
 
     //Column3
 
-    Fl_Box* Column3 = new Fl_Box(FL_FLAT_BOX, 350, 90, 95, 325, 0);
+    Fl_Box* Column3 = new Fl_Box(FL_FLAT_BOX, 352, 105, 95, 325, 0);
     Column3->image(columnTest);
-    EQDials(355, 110, 85, 85, 0, 1 ,2);
-    EQDials(355, 207, 85, 85, 0, 2, 2);
-    EQDials(355, 305, 85, 85, 0, 3 ,2);
+    EQDials(357, 125, 85, 85, 0, 1 ,2);
+    EQDials(357, 222, 85, 85, 0, 2, 2);
+    EQDials(357, 320, 85, 85, 0, 3 ,2);
 
     //Column4
-    Fl_Box* Column4 = new Fl_Box(FL_FLAT_BOX, 500, 90, 95, 325, 0);
+    Fl_Box* Column4 = new Fl_Box(FL_FLAT_BOX, 502, 105, 95, 325, 0);
     Column4->image(columnTest);
-    EQDials(505, 110, 85, 85, 0, 1, 3);
-    EQDials(505, 207, 85, 85, 0, 2, 3);
-    EQDials(505, 305, 85, 85, 0, 3, 3);
+    EQDials(507, 125, 85, 85, 0, 1, 3);
+    EQDials(507, 222, 85, 85, 0, 2, 3);
+    EQDials(507, 320, 85, 85, 0, 3, 3);
 
     //Column5
-    Fl_Box* Column5 = new Fl_Box(FL_FLAT_BOX, 650, 90, 95, 325, 0);
+    Fl_Box* Column5 = new Fl_Box(FL_FLAT_BOX, 652, 105, 95, 325, 0);
     Column5->image(columnTest);
-    EQDials(655, 110, 85, 85, 0, 1, 4);
-    EQDials(655, 207, 85, 85, 0, 2, 4);
-    EQDials(655, 305, 85, 85, 0, 3, 4);
+    EQDials(657,125, 85, 85, 0, 1, 4);
+    EQDials(657,222, 85, 85, 0, 2, 4);
+    EQDials(657,320, 85, 85, 0, 3, 4);
 
     //Column6
-    Fl_Box* Column6 = new Fl_Box(FL_FLAT_BOX, 800, 90, 95, 325, 0);
+    Fl_Box* Column6 = new Fl_Box(FL_FLAT_BOX, 802, 105, 95, 325, 0);
     Column6->image(columnTest);
-    EQDials(805, 110, 85, 85, 0, 1 ,5);
-    EQDials(805, 207, 85, 85, 0, 2, 5);
-    EQDials(805, 305, 85, 85, 0, 3, 5);
+    EQDials(807,125, 85, 85, 0, 1 ,5);
+    EQDials(807,222, 85, 85, 0, 2, 5);
+    EQDials(807,320, 85, 85, 0, 3, 5);
 
     //Column7
-    Fl_Box* Column7 = new Fl_Box(FL_FLAT_BOX, 950, 90, 95, 325, 0);
+    Fl_Box* Column7 = new Fl_Box(FL_FLAT_BOX, 951, 105, 95, 325, 0);
     Column7->image(columnTest);
-    EQDials(955, 110, 85, 85, 0, 1, 6);
-    EQDials(955, 207, 85, 85, 0, 2, 6);
-    EQDials(955, 305, 85, 85, 0, 3, 6);
+    EQDials(957, 125, 85, 85, 0, 1, 6);
+    EQDials(957, 222, 85, 85, 0, 2, 6);
+    EQDials(957, 320, 85, 85, 0, 3, 6);
 
     //Column8
-    Fl_Box* Column8 = new Fl_Box(FL_FLAT_BOX, 1100, 90, 95, 325, 0);
+    Fl_Box* Column8 = new Fl_Box(FL_FLAT_BOX, 1102, 105, 95, 325, 0);
     Column8->image(columnTest);
-    EQDials(1105, 110, 85, 85, 0, 1, 7);
-    EQDials(1105, 207, 85, 85, 0, 2, 7);
-    EQDials(1105, 305, 85, 85, 0, 3, 7);
+    EQDials(1107, 125, 85, 85, 0, 1, 7);
+    EQDials(1107, 222, 85, 85, 0, 2, 7);
+    EQDials(1107, 320, 85, 85, 0, 3, 7);
 
     Fl_PNG_Image* SendBG = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\eqdial.png");
 
     //SENDS 1 AND 2 
-    Send_Dials(60, 450, 75, 75, SendBG, 0);
-    Send_Dials(210, 450, 75, 75, SendBG, 1);
-    Send_Dials(360, 450, 75, 75, SendBG, 2);
-    Send_Dials(510, 450, 75, 75, SendBG, 3);
-    Send_Dials(660, 450, 75, 75, SendBG, 4);
-    Send_Dials(810, 450, 75, 75, SendBG,5);
-    Send_Dials(960, 450, 75, 75, SendBG,6);
-    Send_Dials(1110, 450, 75, 75, SendBG, 7);
+    Send_Dials(60,  465, 75, 75, SendBG, 0);
+    Send_Dials(210, 465, 75, 75, SendBG, 1);
+    Send_Dials(360, 465, 75, 75, SendBG, 2);
+    Send_Dials(510, 465, 75, 75, SendBG, 3);
+    Send_Dials(660, 465, 75, 75, SendBG, 4);
+    Send_Dials(810, 465, 75, 75, SendBG,5);
+    Send_Dials(960, 465, 75, 75, SendBG,6);
+    Send_Dials(1110,465, 75, 75, SendBG, 7);
 
 
 
