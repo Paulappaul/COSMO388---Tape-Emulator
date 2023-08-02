@@ -93,14 +93,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\alcin\Desktop\fltk-1.3.8;C:\Users\alcin\Coding\FLTK;C:\Users\alcin\Desktop\Convolution\FFTConvolver-non-uniform;C:\Users\alcin\Desktop\Convolution\AudioFile-master;C:\Users\alcin\Desktop\portaudio\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\alcin\Coding\FLTK\8_1 duplicate\fltk-gif-animation-master\gif_load;C:\Users\alcin\Coding\FLTK\8_1 duplicate\fltk-gif-animation-master\extern;C:\Users\alcin\Coding\FLTK;C:\Users\alcin\Desktop\Convolution\FFTConvolver-non-uniform;C:\Users\alcin\Desktop\Convolution\AudioFile-master;C:\Users\alcin\Desktop\fltk-1.3.8;C:\Users\alcin\Desktop\portaudio\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\alcin\Coding\FLTK;C:\Users\alcin\Desktop\portaudio\build\msvc\Win32\Debug;C:\Users\alcin\Desktop\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>fltkd.lib;fltkpngd.lib;fltkjpegd.lib;fltkimagesd.lib;fltkformsd.lib;portaudio_x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltkd.lib;fltkformsd.lib;fltkimagesd.lib;fltkjpegd.lib;fltkpngd.lib;fltkzlibd.lib;portaudio_x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

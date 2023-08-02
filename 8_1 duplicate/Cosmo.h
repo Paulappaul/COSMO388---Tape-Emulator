@@ -6,7 +6,6 @@
 #include <vector>
 #include <cmath>
 #include <thread>
-#include <future>
 //#include "dirent.h" // need? 
 #include <filesystem>
 #include <string>
@@ -42,6 +41,8 @@
 #include <FL/Fl_Output.H>
 #include <FL/fl_draw.H>
 #include "FL/Fl_Counter.H"
+#include <Fl_Anim_GIF.H>
+#include <Fl_Anim_GIF.CPP>
 
 
 
@@ -63,6 +64,8 @@ std::string filePath = " ";
 /*GLOBAL VARIABLES*/
 std::string projectName = "";
 std::string projectPath = "";
+Fl_Anim_GIF* globalGif;
+
 
 int ChannelNum = 0;
 double sRate = 44100;

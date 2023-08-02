@@ -5,6 +5,8 @@
 #include "Cosmo_IO.h"
 #include "Cosmo_Clock.h"
 
+
+
             /**********************************************************************************************EQ_LOGIC**************************************************************************************/
 
 
@@ -565,6 +567,9 @@ void recordButtonCallback(Fl_Widget* button, void* userData)
 
 void playButtonCallback(Fl_Widget* widget, void* userData)
 {
+    globalGif->load("C:\\Users\\alcin\\Desktop\\reels.gif");
+    globalGif->speed(1.0);
+    globalGif->start();
     ///
     rewindOn = false;
     rewindStop = false;
@@ -609,7 +614,7 @@ void stopButtonCallback(Fl_Widget* widget, void* data)
     ffOn = false;
     ffStop = false;
     playBackOn = false;
-
+    globalGif->stop();
     TransportButtons* transportButtons = static_cast<TransportButtons*>(data);
 
     transportButtons->play->color(FL_WHITE);
@@ -660,7 +665,10 @@ void stopButtonCallback(Fl_Widget* widget, void* data)
 
 void rewindButtonCallback(Fl_Widget* widget, void* data)
 {
-
+    globalGif->load("C:\\Users\\alcin\\Desktop\\reelsReverse.gif");
+    globalGif->speed(4.0);
+    globalGif->start();
+    
     ffOn = false;
     ffStop = false;
 
@@ -707,7 +715,9 @@ void rewindButtonCallback(Fl_Widget* widget, void* data)
 
 void fastForwardButtonCallback(Fl_Widget* widget, void* data)
 {
-
+    globalGif->load("C:\\Users\\alcin\\Desktop\\reels.gif");
+    globalGif->speed(4.0);
+    globalGif->start();
     rewindOn = false;
     rewindStop = false;
 
@@ -768,7 +778,7 @@ void loadButtonCallback(Fl_Widget* widget, void*)
             project.channelLocations[selectedNumber -1] = filename;
             std::cout << project.channelLocations[selectedNumber -1] << " written to channel location " << numStr << std::endl;
             std::cout << "filename: " << filename << std::endl;
-           ConvolutionSetup(selectedNumber - 1, 0); 
+           convolution(selectedNumber - 1, 0); 
            createDocument(filePath, project);
         }
     }
@@ -929,7 +939,6 @@ Fl_Double_Window* mainWindow()
 
     // Load PNG image
     Fl_PNG_Image* pngImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\VuMeter.png");
-    Fl_PNG_Image* reelImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\reels.png");
     if (pngImage->fail())
     {
         delete pngImage;
@@ -946,7 +955,15 @@ Fl_Double_Window* mainWindow()
     Fl_Box* channel7 = new Fl_Box(0, 0, 2000, 130, 0);
     Fl_Box* channel8 = new Fl_Box(0, 0, 2300, 130, 0);
 
-    Fl_Box* Reel2Reel = new Fl_Box(0, 0, 3015, 500, 0);
+   // Fl_Box* Reel2Reel = new Fl_Box(0, 0, 3015, 500, 0);
+
+    //research the CPU aspects
+    globalGif = new Fl_Anim_GIF(1240, 140, 498, 309, "C:\\Users\\alcin\\Desktop\\Reels.gif");
+    globalGif->stop();
+   // globalGifreverse = new Fl_Anim_GIF(1240, 140, 498, 309, "C:\\Users\\alcin\\Desktop\\Reels.gif");
+    //globalGifreverse->hide();
+
+
 
     channel1->image(pngImage);
     channel2->image(pngImage);
@@ -956,7 +973,7 @@ Fl_Double_Window* mainWindow()
     channel6->image(pngImage);
     channel7->image(pngImage);
     channel8->image(pngImage);
-  //  Reel2Reel->image(reelImage);
+
 
   
 
@@ -1045,8 +1062,6 @@ Fl_Double_Window* mainWindow()
     Send_Dials(1110,465, 75, 75, SendBG, 7);
 
 
-
-    
     return window;
 
 }
