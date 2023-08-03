@@ -64,14 +64,14 @@ void WriteAudio(dataBuffer& datapass, int channel2Write)
 
 }
 
-std::vector<double> WOW_and_FLUTTER_Function(const std::vector<double>& x, int SAMPLERATE, double Modfreq, double Width)
+std::vector<float> WOW_and_FLUTTER_Function(const std::vector<float>& x, int SAMPLERATE, double Modfreq, double Width)
 {
     int WIDTH = static_cast<int>(std::round(Width * SAMPLERATE));
     double MODFREQ = Modfreq / SAMPLERATE;
     int LEN = x.size();
     int L = 2 + WIDTH + WIDTH * 2;
     std::vector<double> Delayline(L, 0.0);
-    std::vector<double> y(LEN, 0.0);
+    std::vector<float> y(LEN, 0.0);
 
     for (int n = 0; n < LEN; n++)
     {
@@ -96,11 +96,11 @@ void convolution(int channelName, int load)
     if (load == 0)
     {
         Input_filename = project.channelLocations[channelName];
-            std::cout << "loading: " << project.channelLocations[channelName] << std::endl;
+        std::cout << "loading: " << project.channelLocations[channelName] << std::endl;
     }
     else if (load == 1)
     {
-         Input_filename = projectPath + "RAW/" + project.channelNames[channelName] + ".wav";
+        Input_filename = projectPath + "RAW/" + project.channelNames[channelName] + ".wav";
     }
 
     const std::string Impulse_filename = "C:\\Users\\alcin\\Desktop\\Convolution\\stream\\boy.wav";
@@ -119,7 +119,7 @@ void convolution(int channelName, int load)
         exit(1);
     }
     else {
-        std::cout << "Input Loaded" << std::endl;
+        std::cout << "Input File Loaded" << std::endl;
     }
 
     if (!impulsefile.load(Impulse_filename)) {
@@ -127,28 +127,24 @@ void convolution(int channelName, int load)
         exit(1);
     }
     else {
-        std::cout << "Output Loaded" << std::endl;
+        std::cout << "Impulse Response Loaded" << std::endl;
     }
 
-    // Read the audio data as floating-point values
-
-    const std::vector<float>& inputData = inputFile.samples[0]; // Assuming mono audio
-    const std::vector<float>& impulseData = impulsefile.samples[0]; // Assuming mono audio
-
-    size_t inputlengthinSeconds = inputFile.getLengthInSeconds();
     int inputtotalsampleSize = inputFile.getNumSamplesPerChannel();
-
-    size_t impulselengthinSeconds = impulsefile.getLengthInSeconds();
     int impulsetotalsampleSize = impulsefile.getNumSamplesPerChannel();
 
-    // Prepare input 
+    /***************************************************************************************STEP 1: Convolve Audio Signal***************************************************************************************************/
+
+    // Prepare input
     std::vector<fftconvolver::Sample>& in = inputFile.samples[0];
 
     // Prepare Impulse
     std::vector<fftconvolver::Sample>& ir = impulsefile.samples[0];
 
-    std::vector<fftconvolver::Sample> out(inputtotalsampleSize);
+    // Prepare Ouput
+    std::vector<fftconvolver::Sample> out(inputFile.getNumSamplesPerChannel());
 
+    // Perform Convolution
     if (fft.init(1024, &ir[0], impulsetotalsampleSize) == true)
     {
         std::cout << "Processing" << std::endl;
@@ -159,62 +155,65 @@ void convolution(int channelName, int load)
         std::cout << "Failed to initialize" << std::endl;
     }
 
-    // Generate white noise at -56dB
+    std::cout << "Main Audio Convolution Ended " << std::endl;
+
+    /****************************************************************************** STEP 2: Combine White Noise with Convolved Signal ***************************************************************************************/
+
+    // Generate white noise
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
     std::vector<float> whiteNoise(inputtotalsampleSize);
-    const float noiseLevel = -60.0f;  // Desired noise level in dB -56 natively
+    const float noiseLevel = -56.0f;                                                // Desired noise level in dB -56 natively
     const float noiseAmplitude = std::pow(10.0f, noiseLevel / 20.0f);
 
-    for (size_t i = 0; i < inputtotalsampleSize; i++) {
+    std::cout << "white noise begun" << std::endl;
+    for (size_t i = 0; i < inputtotalsampleSize; i++)
+    {
         whiteNoise[i] = dist(gen) * noiseAmplitude;
     }
+    std::cout << "white noise end" << std::endl;
 
-    // Convolve the white noise with the impulse response
+    // Convolve the white noise with the impulse response and store the result in the same buffer (noiseConvolved)
     std::vector<float> noiseConvolved(inputtotalsampleSize);
+    std::cout << "White Convolution begin" << std::endl;
     fft.process(&whiteNoise[0], &noiseConvolved[0], inputtotalsampleSize);
+    std::cout << "White Convolution end" << std::endl;
 
-    // Add the output and the noise-convolved output
+    // Combine the output and the noise-convolved output in the same buffer (combinedSignal)
     std::vector<float> combinedSignal(inputtotalsampleSize);
-
-    for (size_t i = 0; i < inputtotalsampleSize; i++) {
-        combinedSignal[i] = out[i] + noiseConvolved[i];
-    }
-
-    // Normalize the combined signal to -12dB
-    const float targetLevel = -12.0f;  // Target level in dB
+    combinedSignal.reserve(inputtotalsampleSize);
+    const float targetLevel = -12.0f; // Target level in dB
     const float normalizationFactor = std::pow(10.0f, targetLevel / 20.0f);
-    for (size_t i = 0; i < inputtotalsampleSize; i++) {
+    for (size_t i = 0; i < inputtotalsampleSize; i++)
+    {
+        combinedSignal[i] = out[i] + noiseConvolved[i];
         combinedSignal[i] *= normalizationFactor;
     }
+
+    std::cout << "flutter begin" << std::endl;
+    // Apply WOW and FLUTTER effect
+    std::vector<float> finalSignal = WOW_and_FLUTTER_Function(combinedSignal, sRate, wFdepth, wFrate);
+    std::cout << "flutter end" << std::endl;
 
     // Create an AudioFile object
     AudioFile<float> audioFile;
 
-
-
-    // Convert float to std::vector<double>
-    std::vector<double> audioDataDouble(combinedSignal.begin(), combinedSignal.end());
-
-    // Apply WOW and FLUTTER effect
-    std::vector<double> processedData = WOW_and_FLUTTER_Function(audioDataDouble, sRate, wFdepth, wFrate);
-
     // Create a multi-channel buffer with a single channel
     AudioFile<float>::AudioBuffer buffer;
     buffer.resize(1);
-    buffer[0] = std::vector<float>(processedData.begin(), processedData.end());
-
+    buffer[0] = std::move(finalSignal);
 
     // Set the audio data
     audioFile.setAudioBuffer(buffer);
 
     // Set the sample rate and number of channels
     audioFile.setSampleRate(sRate);
-    audioFile.setNumChannels(1);  // Mono audio
+    audioFile.setNumChannels(1); // Mono audio
 
     // Write the audio data to the WAV file
-    if (!audioFile.save(outputfilename)) {
+    if (!audioFile.save(outputfilename))
+    {
         std::cerr << "Failed to write audio file." << std::endl;
         exit(1);
     }
@@ -228,17 +227,14 @@ void convolution(int channelName, int load)
         project.channelStartTimes[channelName] = 0;
         project.channelLengths[channelName] = audioFile.getNumSamplesPerChannel();
         std::cout << "Number of Samples: " << audioFile.getNumSamplesPerChannel() << std::endl;
-
     }
-
-
 }
 
 
 
 /*
-// Function to process audio samples in parallel
-void processAudioChunk( std::vector<float>& audioSamples, std::vector<float>& impulseData,
+
+void processAudioChunk(std::vector<float>& audioSamples, std::vector<float>& impulseData,
     int startIndex, int endIndex, std::vector<fftconvolver::Sample>& out)
 {
     FFTConvolver fft;
@@ -249,11 +245,10 @@ void processAudioChunk( std::vector<float>& audioSamples, std::vector<float>& im
     if (fft.init(1024, &ir[0], ir.size()) == true)
     {
         std::cout << "Processing chunk from index " << startIndex << " to " << endIndex << std::endl;
-        std::cout << "Number of input output samples: " << endIndex - startIndex  << std::endl;
-        fft.process(&audioSamples[startIndex], &out[0], endIndex - startIndex );
+        std::cout << "Number of input output samples: " << endIndex - startIndex << std::endl;
+        fft.process(&audioSamples[startIndex], &out[0], endIndex - startIndex);
     }
 }
-
 
 
 void ConvolutionSetup(int channelName, int load)
@@ -312,7 +307,7 @@ void ConvolutionSetup(int channelName, int load)
     size_t impulselengthinSeconds = impulsefile.getLengthInSeconds();
     int impulsetotalsampleSize = impulsefile.getNumSamplesPerChannel();
 
-    int numThreads = 2;
+    int numThreads = 4;
 
     // Calculate the chunk size for each thread
     int chunkSize = inputData.size() / numThreads;
@@ -430,4 +425,6 @@ void ConvolutionSetup(int channelName, int load)
 
 
 
-}*/
+}
+
+*/

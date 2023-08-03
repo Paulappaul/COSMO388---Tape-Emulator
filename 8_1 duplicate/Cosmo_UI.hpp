@@ -890,49 +890,57 @@ Fl_Double_Window* mainWindow()
 
 
     //Transport Display
-    Fl_Button* Play = new Fl_Button(1390, 800, 100, 100);
-    Fl_Button* Rewind = new Fl_Button(1290, 800, 100, 100);
-    Fl_Button* Stop = new Fl_Button(1490, 800, 100, 100);
-    Fl_Button* FastForward = new Fl_Button(1590, 800, 100, 100);
-    Fl_Button* recordButton = new Fl_Button(1390, 700, 200, 100, "@circle");
-
+    Fl_Button* Play = new Fl_Button(1390, 820, 100, 100);
+    Fl_Button* Rewind = new Fl_Button(1290, 820, 100, 100);
+    Fl_Button* Stop = new Fl_Button(1490, 820, 100, 100);
+    Fl_Button* FastForward = new Fl_Button(1590, 820, 100, 100);
+    Fl_Button* recordButton = new Fl_Button(1390, 720, 200, 100, "@circle");
+    Fl_Button* loadButton = new Fl_Button(1290, 720, 100, 100);
+    Fl_Button* saveButton = new Fl_Button(1590, 720, 100, 100);
     TransportButtons* transportButtons = new TransportButtons(Play, FastForward, Rewind, recordButton);
 
+ 
+  
+    loadButton->label("@fileopen");
+    loadButton->callback(loadButtonCallback);
+    loadButton->labelsize(18);
+
+
+    saveButton->label("@filesave");
+    saveButton->callback(saveButtonCallback);
+    saveButton->labelsize(18);
+
     Play->label("@>");
+    Play->labelsize(22);
     Play->callback(playButtonCallback,  transportButtons);
   
 
     Rewind->label("@<<");
     Rewind->callback(rewindButtonCallback, transportButtons);
+    Rewind->labelsize(18);
 
     FastForward->label("@>>");
     FastForward->callback(fastForwardButtonCallback,  transportButtons);
+    FastForward->labelsize(18);
 
     recordButton->callback(recordButtonCallback,  transportButtons);
-
+    recordButton->labelsize(16);
 
     Stop->label("@square");
     Stop->callback(stopButtonCallback, transportButtons);
-    
+    Stop->labelsize(16);
+
     // Record or Playback Sliders
 
-    createRecPlaySlider(0, "1", 1240, 570, 35, 100);
-    createRecPlaySlider(1, "2", 1306, 570, 35, 100);
-    createRecPlaySlider(2, "3", 1372, 570, 35, 100);
-    createRecPlaySlider(3, "4", 1438, 570, 35, 100);
-    createRecPlaySlider(4, "5", 1504, 570, 35, 100);
-    createRecPlaySlider(5, "6", 1570, 570, 35, 100);
-    createRecPlaySlider(6, "7", 1635, 570, 35, 100);
-    createRecPlaySlider(7, "8", 1700, 570, 35, 100);
+    createRecPlaySlider(0, "1", 1240, 580, 35, 100);
+    createRecPlaySlider(1, "2", 1306, 580, 35, 100);
+    createRecPlaySlider(2, "3", 1372, 580, 35, 100);
+    createRecPlaySlider(3, "4", 1438, 580, 35, 100);
+    createRecPlaySlider(4, "5", 1504, 580, 35, 100);
+    createRecPlaySlider(5, "6", 1570, 580, 35, 100);
+    createRecPlaySlider(6, "7", 1635, 580, 35, 100);
+    createRecPlaySlider(7, "8", 1700, 580, 35, 100);
 
-    //Load and Save Button
-    Fl_Button* loadButton = new Fl_Button(1290, 700, 100, 100);
-    loadButton->label("@fileopen");
-    loadButton->callback(loadButtonCallback);
-
-    Fl_Button* saveButton = new Fl_Button(1590, 700, 100, 100);
-    saveButton->label("@filesave");
-    saveButton->callback(saveButtonCallback);
 
 
 
@@ -955,13 +963,11 @@ Fl_Double_Window* mainWindow()
     Fl_Box* channel7 = new Fl_Box(0, 0, 2000, 130, 0);
     Fl_Box* channel8 = new Fl_Box(0, 0, 2300, 130, 0);
 
-   // Fl_Box* Reel2Reel = new Fl_Box(0, 0, 3015, 500, 0);
 
     //research the CPU aspects
     globalGif = new Fl_Anim_GIF(1240, 140, 498, 309, "C:\\Users\\alcin\\Desktop\\Reels.gif");
     globalGif->stop();
-   // globalGifreverse = new Fl_Anim_GIF(1240, 140, 498, 309, "C:\\Users\\alcin\\Desktop\\Reels.gif");
-    //globalGifreverse->hide();
+
 
 
 
@@ -1060,6 +1066,7 @@ Fl_Double_Window* mainWindow()
     Send_Dials(810, 465, 75, 75, SendBG,5);
     Send_Dials(960, 465, 75, 75, SendBG,6);
     Send_Dials(1110,465, 75, 75, SendBG, 7);
+
 
 
     return window;

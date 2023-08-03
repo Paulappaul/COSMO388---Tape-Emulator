@@ -12,8 +12,8 @@
 #include <fstream>
 #include <sstream>
 
-#include <atomic>
 
+#include <future>
 //AUDIO STREAM AND WRITE
 #include <audioFile.h>
 #include "portaudio.h"
@@ -39,10 +39,12 @@
 #include <FL/Fl_File_Chooser.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
-#include <FL/fl_draw.H>
 #include "FL/Fl_Counter.H"
 #include <Fl_Anim_GIF.H>
 #include <Fl_Anim_GIF.CPP>
+
+
+#include <string>
 
 
 
