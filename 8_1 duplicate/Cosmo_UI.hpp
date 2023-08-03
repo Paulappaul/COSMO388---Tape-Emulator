@@ -486,7 +486,7 @@ void createRecPlaySlider(int channel, const char* name, int x, int y, int w, int
 }
 
 
-              /**********************************************************************************************TRANSPORT**************************************************************************************/
+/**********************************************************************************************TRANSPORT**************************************************************************************/
 
 struct TransportButtons
 {
@@ -862,30 +862,24 @@ void sessionSetup()
 
 Fl_Double_Window* mainWindow()
 {
+    //Window and Box Drop
     Fl_Double_Window* window = new Fl_Double_Window(1800, 1000, "Cosmo38");
-
-
     Fl_PNG_Image* windowImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\Background.png");
     Fl_Box* imagebox = new Fl_Box(0, 0, 1800, 1000);
     imagebox->image(windowImage);
- // window->color(fl_rgb_color(79, 66, 60));
 
 
-    //Time
+    //Clock Counter
     TimeBox* timeBox = new TimeBox(1290, 460, 400, 100);
     timeBox->box(FL_UP_BOX);
     timeBox->labelsize(24);
     timeBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-   timeBox->color(FL_BLACK);
-   // timeBox->type(FL_OVAL_BOX);
+    timeBox->color(FL_BLACK);
     timeBox->labelcolor(FL_DARK_GREEN);
     timeBox->labelfont(FL_SCREEN_BOLD);
 
-
-    //Logo
-   // Fl_PNG_Image* logoImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\cosmo388.png");
     Fl_Box* logo = new Fl_Box(1460, 5, 100, 80);
-   // logo->image(logoImage);
+
 
 
 
@@ -899,12 +893,9 @@ Fl_Double_Window* mainWindow()
     Fl_Button* saveButton = new Fl_Button(1590, 720, 100, 100);
     TransportButtons* transportButtons = new TransportButtons(Play, FastForward, Rewind, recordButton);
 
- 
-  
     loadButton->label("@fileopen");
     loadButton->callback(loadButtonCallback);
     loadButton->labelsize(18);
-
 
     saveButton->label("@filesave");
     saveButton->callback(saveButtonCallback);
@@ -914,7 +905,6 @@ Fl_Double_Window* mainWindow()
     Play->labelsize(22);
     Play->callback(playButtonCallback,  transportButtons);
   
-
     Rewind->label("@<<");
     Rewind->callback(rewindButtonCallback, transportButtons);
     Rewind->labelsize(18);
@@ -931,7 +921,6 @@ Fl_Double_Window* mainWindow()
     Stop->labelsize(16);
 
     // Record or Playback Sliders
-
     createRecPlaySlider(0, "1", 1240, 580, 35, 100);
     createRecPlaySlider(1, "2", 1306, 580, 35, 100);
     createRecPlaySlider(2, "3", 1372, 580, 35, 100);
@@ -941,17 +930,8 @@ Fl_Double_Window* mainWindow()
     createRecPlaySlider(6, "7", 1635, 580, 35, 100);
     createRecPlaySlider(7, "8", 1700, 580, 35, 100);
 
-
-
-
-
-    // Load PNG image
+    // VU Meters Image
     Fl_PNG_Image* pngImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\VuMeter.png");
-    if (pngImage->fail())
-    {
-        delete pngImage;
-        exit(1);
-    }
 
     // VU Meters
     Fl_Box* channel1 = new Fl_Box(0, 0, 200,  130, 0);
@@ -963,14 +943,6 @@ Fl_Double_Window* mainWindow()
     Fl_Box* channel7 = new Fl_Box(0, 0, 2000, 130, 0);
     Fl_Box* channel8 = new Fl_Box(0, 0, 2300, 130, 0);
 
-
-    //research the CPU aspects
-    globalGif = new Fl_Anim_GIF(1240, 140, 498, 309, "C:\\Users\\alcin\\Desktop\\Reels.gif");
-    globalGif->stop();
-
-
-
-
     channel1->image(pngImage);
     channel2->image(pngImage);
     channel3->image(pngImage);
@@ -980,9 +952,11 @@ Fl_Double_Window* mainWindow()
     channel7->image(pngImage);
     channel8->image(pngImage);
 
+   //Reel 2 Reel Animation; research CPU usage.. caching 
+    globalGif = new Fl_Anim_GIF(1240, 140, 498, 309, "C:\\Users\\alcin\\Desktop\\Reels.gif");
+    globalGif->stop();
 
-  
-
+    //Volume Sliders
     createVolumeSlider(30, 680, 136, 300, 1);
     createVolumeSlider(180, 680, 136, 300, 2);
     createVolumeSlider(330, 680, 136, 300, 3);
@@ -992,8 +966,7 @@ Fl_Double_Window* mainWindow()
     createVolumeSlider(930, 680, 136, 300, 7);
     createVolumeSlider(1080,680, 136, 300, 8);
 
-    
-
+    //EQ DIALS
 
     //Column1
     Fl_PNG_Image* columnTest = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\dial.png");

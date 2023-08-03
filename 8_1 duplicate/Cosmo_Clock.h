@@ -17,8 +17,6 @@ void updateTime(void*)
             }
         }
 
-
-        // Redraw the window
         Fl::redraw();
     }
     else if (rewindOn == true)
@@ -39,6 +37,7 @@ void updateTime(void*)
             {
                 rewindOn = false;
                 rewindStop = true;
+                globalGif->stop();
             }
             else if(second <=0)
             {
@@ -51,8 +50,6 @@ void updateTime(void*)
                 }
             }
 
-
-            // Redraw the window
             Fl::redraw();
 
         }
@@ -82,12 +79,9 @@ void updateTime(void*)
             }
 
 
-            // Redraw the window
             Fl::redraw();
 
         }
-
-
 
     }
 

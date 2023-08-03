@@ -174,13 +174,11 @@ void convolution(int channelName, int load)
     }
     std::cout << "white noise end" << std::endl;
 
-    // Convolve the white noise with the impulse response and store the result in the same buffer (noiseConvolved)
+    //Convolve the White Noise
     std::vector<float> noiseConvolved(inputtotalsampleSize);
-    std::cout << "White Convolution begin" << std::endl;
     fft.process(&whiteNoise[0], &noiseConvolved[0], inputtotalsampleSize);
-    std::cout << "White Convolution end" << std::endl;
 
-    // Combine the output and the noise-convolved output in the same buffer (combinedSignal)
+    // Combine the output and the noise-convolved output into the same buffer (combinedSignal) and Normalize the output
     std::vector<float> combinedSignal(inputtotalsampleSize);
     combinedSignal.reserve(inputtotalsampleSize);
     const float targetLevel = -12.0f; // Target level in dB
@@ -191,13 +189,16 @@ void convolution(int channelName, int load)
         combinedSignal[i] *= normalizationFactor;
     }
 
-    std::cout << "flutter begin" << std::endl;
-    // Apply WOW and FLUTTER effect
-    std::vector<float> finalSignal = WOW_and_FLUTTER_Function(combinedSignal, sRate, wFdepth, wFrate);
-    std::cout << "flutter end" << std::endl;
+    /****************************************************************************** STEP 3: WOW AND FLUTTER ***************************************************************************************/
 
-    // Create an AudioFile object
-    AudioFile<float> audioFile;
+    // Apply WOW and FLUTTER effect. Originally wrote the Algorithm for Double instead of Float. This has the most computation time!
+    std::vector<float> finalSignal = WOW_and_FLUTTER_Function(combinedSignal, sRate, wFdepth, wFrate);
+
+
+
+
+    /****************************************************************************** STEP 4: Export the Audio File ***************************************************************************************/
+
 
     // Create a multi-channel buffer with a single channel
     AudioFile<float>::AudioBuffer buffer;
@@ -205,6 +206,9 @@ void convolution(int channelName, int load)
     buffer[0] = std::move(finalSignal);
 
     // Set the audio data
+
+    // Create an AudioFile object
+    AudioFile<float> audioFile;
     audioFile.setAudioBuffer(buffer);
 
     // Set the sample rate and number of channels
@@ -233,6 +237,8 @@ void convolution(int channelName, int load)
 
 
 /*
+
+LEGACY CODE, Playing around with Concurrency. Problem is Poppinn!
 
 void processAudioChunk(std::vector<float>& audioSamples, std::vector<float>& impulseData,
     int startIndex, int endIndex, std::vector<fftconvolver::Sample>& out)
