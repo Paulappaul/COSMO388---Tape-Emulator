@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,21 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cosmo.h" />
-    <ClInclude Include="Cosmo_Clock.h" />
-    <ClInclude Include="Cosmo_Convolution.h" />
-    <ClInclude Include="Cosmo_FileManager.hpp" />
-    <ClInclude Include="Cosmo_IO.h" />
-    <ClInclude Include="Cosmo_UI.hpp" />
+    <ClCompile Include="Cosmo_Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FLTK.cpp" />
+    <ClInclude Include="headers\Cosmo.h" />
+    <ClInclude Include="headers\Cosmo_Clock.h" />
+    <ClInclude Include="headers\Cosmo_Convolution.h" />
+    <ClInclude Include="headers\Cosmo_FileManager.hpp" />
+    <ClInclude Include="headers\Cosmo_IO.h" />
+    <ClInclude Include="headers\Cosmo_UI.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{12583cfc-b2c2-427e-b22f-5b074d14f9c1}</ProjectGuid>
-    <RootNamespace>FLTK</RootNamespace>
+    <RootNamespace>Cosmo388</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -93,14 +93,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\alcin\Desktop\fltk-1.3.8;C:\Users\alcin\Coding\FLTK;C:\Users\alcin\Desktop\Convolution\FFTConvolver-non-uniform;C:\Users\alcin\Desktop\Convolution\AudioFile-master;C:\Users\alcin\Desktop\portaudio\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\alcin\Coding\FLTK\headers;C:\Users\alcin\Coding\FLTK\fltk-gif-animation-master\extern;C:\Users\alcin\Coding\FLTK\fltk-gif-animation-master\gif_load;C:\Users\alcin\Coding\Cosmo388;C:\Users\alcin\Desktop\Convolution\FFTConvolver-non-uniform;C:\Users\alcin\Desktop\Convolution\AudioFile-master;C:\Users\alcin\Desktop\fltk-1.3.8;C:\Users\alcin\Desktop\portaudio\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\alcin\Coding\FLTK;C:\Users\alcin\Desktop\portaudio\build\msvc\Win32\Debug;C:\Users\alcin\Desktop\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>fltkd.lib;fltkpngd.lib;fltkjpegd.lib;fltkimagesd.lib;fltkformsd.lib;portaudio_x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\alcin\Coding\Cosmo388;C:\Users\alcin\Desktop\portaudio\build\msvc\Win32\Debug;C:\Users\alcin\Desktop\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>fltkd.lib;fltkformsd.lib;fltkimagesd.lib;fltkjpegd.lib;fltkpngd.lib;fltkzlibd.lib;portaudio_x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -133,7 +133,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\alcin\Desktop\make 3\iir.dir\Debug";C:\Users\alcin\Coding\FLTK;C:\Users\alcin\Desktop\portaudio\build\msvc\Win32\Debug;C:\Users\alcin\Desktop\make 3\Debug;C:\Users\alcin\Desktop\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\alcin\Desktop\make 3\iir.dir\Debug";C:\Users\alcin\Coding\Cosmo388;C:\Users\alcin\Desktop\portaudio\build\msvc\Win32\Debug;C:\Users\alcin\Desktop\make 3\Debug;C:\Users\alcin\Desktop\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>fltkd.lib;fltkformsd.lib;fltkimagesd.lib;fltkjpegd.lib;portaudio_x86.lib;iir_static.lib;..\Debug\iir_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
