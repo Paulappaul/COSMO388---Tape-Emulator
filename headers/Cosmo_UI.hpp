@@ -521,7 +521,6 @@ void recordButtonCallback(Fl_Widget* button, void* userData)
 
 
 
-    //TO DO: Research this, when does the Thread end? What is Detach exactly? Why is Detach called twice? i.e. above. 
     // Offload the openStream function to a separate thread
     intialize(err);
 
@@ -555,6 +554,17 @@ void recordButtonCallback(Fl_Widget* button, void* userData)
         {
 
             std::cout << "PLAYBACK INTIALIZED FOR CHANNEL: " << i << std::endl;
+            if (project.channelLocations[i] != " ")
+            {
+                playBackOn = true;
+                std::cout << i << "PROJECT LOCATION: " << project.channelLocations[i] << std::endl;
+
+                std::thread playback(playbackThread, project.channelLocations[i], project.channelStartTimes[i], project.channelLengths[i], i + 1);
+
+
+                playback.detach();
+            }
+
         }
     
     

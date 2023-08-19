@@ -22,38 +22,33 @@ void updateTime(void*)
     else if (rewindOn == true)
     {
         timeout = 0.2;
-        if(hour == 0 && minute == 0 && second == 0)
+        if (hour == 0 && minute == 0 && second == 0)
         {
             globalGif->stop();
             std::cout << "timer = 0" << std::endl;
             rewindOn = false;
             rewindStop = true;
-
         }
-        else 
+        else
         {
             second--;
-            if (second <= 0 && hour ==0 && second == 0)
+            if (second < 0)
             {
-                rewindOn = false;
-                rewindStop = true;
-                globalGif->stop();
-            }
-            else if(second <=0)
-            {
-                rewindStop = false; 
-                second = 60;
-                minute--;
-                if (minute <= 0) {
-                    minute = 60;
+                if (minute > 0) {
+                    minute--;
+                    second = 59; // Decrement to 59 seconds
+                }
+                else if (hour > 0) {
+                    minute = 59;
+                    second = 59;
                     hour--;
                 }
             }
 
             Fl::redraw();
-
         }
     }
+
     else if (ffOn == true)
     {
         timeout = 0.2; 
