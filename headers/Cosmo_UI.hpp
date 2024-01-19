@@ -577,7 +577,7 @@ void recordButtonCallback(Fl_Widget* button, void* userData)
 
 void playButtonCallback(Fl_Widget* widget, void* userData)
 {
-    globalGif->load("C:\\Users\\alcin\\Desktop\\reels.gif");
+    globalGif->load("Images\\reels.gif");
     globalGif->speed(1.0);
     globalGif->start();
     ///
@@ -675,7 +675,7 @@ void stopButtonCallback(Fl_Widget* widget, void* data)
 
 void rewindButtonCallback(Fl_Widget* widget, void* data)
 {
-    globalGif->load("C:\\Users\\alcin\\Desktop\\reelsReverse.gif");
+    globalGif->load("Images\\reelsReverse.gif");
     globalGif->speed(4.0);
     globalGif->start();
     
@@ -725,7 +725,7 @@ void rewindButtonCallback(Fl_Widget* widget, void* data)
 
 void fastForwardButtonCallback(Fl_Widget* widget, void* data)
 {
-    globalGif->load("C:\\Users\\alcin\\Desktop\\reels.gif");
+    globalGif->load("Images\\reels.gif");
     globalGif->speed(4.0);
     globalGif->start();
     rewindOn = false;
@@ -874,7 +874,7 @@ Fl_Double_Window* mainWindow()
 {
     //Window and Box Drop
     Fl_Double_Window* window = new Fl_Double_Window(1800, 1000, "Cosmo38");
-    Fl_PNG_Image* windowImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\Background.png");
+    Fl_PNG_Image* windowImage = new Fl_PNG_Image("Images\\Background.png");
     Fl_Box* imagebox = new Fl_Box(0, 0, 1800, 1000);
     imagebox->image(windowImage);
 
@@ -941,7 +941,8 @@ Fl_Double_Window* mainWindow()
     createRecPlaySlider(7, "8", 1700, 580, 35, 100);
 
     // VU Meters Image
-    Fl_PNG_Image* pngImage = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\VuMeter.png");
+    Fl_PNG_Image* pngImage = new Fl_PNG_Image("Images\\VuMeter.png");
+
 
     // VU Meters
     Fl_Box* channel1 = new Fl_Box(0, 0, 200,  130, 0);
@@ -963,7 +964,7 @@ Fl_Double_Window* mainWindow()
     channel8->image(pngImage);
 
    //Reel 2 Reel Animation; research CPU usage.. caching 
-    globalGif = new Fl_Anim_GIF(1240, 140, 498, 309, "C:\\Users\\alcin\\Desktop\\Reels.gif");
+    globalGif = new Fl_Anim_GIF(1240, 140, 498, 309, "Images\\Reels.gif");
     globalGif->stop();
 
     //Volume Sliders
@@ -979,7 +980,7 @@ Fl_Double_Window* mainWindow()
     //EQ DIALS
 
     //Column1
-    Fl_PNG_Image* columnTest = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\dial.png");
+    Fl_PNG_Image* columnTest = new Fl_PNG_Image("Images\\dial.png");
     Fl_Box* Column1 = new Fl_Box(FL_FLAT_BOX, 52, 105, 95, 325, 0);
     Column1->image(columnTest);
     Column1->type(FL_FLAT_BOX);
@@ -1038,7 +1039,7 @@ Fl_Double_Window* mainWindow()
     EQDials(1107, 222, 85, 85, 0, 2, 7);
     EQDials(1107, 320, 85, 85, 0, 3, 7);
 
-    Fl_PNG_Image* SendBG = new Fl_PNG_Image("C:\\Users\\alcin\\Desktop\\eqdial.png");
+    Fl_PNG_Image* SendBG = new Fl_PNG_Image("Images\eqdial.png");
 
     //SENDS 1 AND 2 
     Send_Dials(60,  465, 75, 75, SendBG, 0);

@@ -64,22 +64,68 @@ void WriteAudio(dataBuffer& datapass, int channel2Write)
 
 }
 
-std::vector<float> WOW_and_FLUTTER_Function(const std::vector<float>& x, int SAMPLERATE, double Modfreq, double Width)
+std::vector<float> WOW_and_FLUTTER_Function(const std::vector<float>& input)
 {
-    int WIDTH = static_cast<int>(std::round(Width * SAMPLERATE));
-    double MODFREQ = Modfreq / SAMPLERATE;
-    int LEN = x.size();
-    int L = 2 + WIDTH + WIDTH * 2;
-    std::vector<double> Delayline(L, 0.0);
-    std::vector<float> y(LEN, 0.0);
+    const double modfreq = 0.7 / sRate;
+    const double preCalWave = modfreq * 2 * pi;
+    const int width = static_cast<int>(std::round(0.002 * sRate));
+    const int L = 2 + width + width * 2;
+    const int len = input.size();
+    int writeIndex = 0;
+    double mod = 0.0, tap = 0.0, frac = 0.0;
+    int i = 0, idx = 0;
 
-    for (int n = 0; n < LEN; n++)
+    std::vector<float> y(len, 0.0);
+    std::vector<double> Delayline(L, 0.0);
+
+    for (int n = 0; n < len; n++)
     {
-        double MOD = std::sin(MODFREQ * 2 * pi * n);
-        double TAP = 1 + WIDTH + WIDTH * MOD;
-        int i = static_cast<int>(std::floor(TAP));
-        double frac = TAP - i;
-        Delayline.insert(Delayline.begin(), x[n]);
+        mod = std::sin(preCalWave * n);
+        tap = 1 + width + width * mod;
+        i = static_cast<int>(tap);
+        frac = tap - i;
+
+        Delayline[writeIndex] = input[n];
+        writeIndex = (writeIndex + 1) % L; 
+
+        idx = (writeIndex + L - i - 1) % L;
+
+        // Linear Interpolation
+        y[n] = Delayline[idx] * frac + Delayline[(idx + 1) % L] * (1 - frac);
+    }
+
+    return y;
+}
+
+
+
+/*
+std::vector<float> WOW_and_FLUTTER_Function(const std::vector<float>& input)
+{
+    const double modfreq = 0.7 / sRate;
+    const double width = static_cast<int>(std::round(0.002 * sRate));
+    const int L = 2 + width + width * 2;
+    const double preCalWave = modfreq * 2 * pi;
+    double mod = 0;
+    double tap = 0;
+    double frac = 0;
+    int i = 0;
+    int len = input.size();
+
+    std::vector<double> Delayline(L, 0.0);
+    std::vector<float> y(len, 0.0);
+ 
+
+
+    for (int n = 0; n < len; n++)
+    {
+        mod = std::sin(preCalWave * n);
+        tap = 1 + width + width * mod;
+        i = static_cast<int>(std::floor(tap));
+        frac = tap - i;
+
+
+        Delayline.insert(Delayline.begin(), input[n]);
         Delayline.resize(L);
 
         // Linear Interpolation
@@ -88,6 +134,11 @@ std::vector<float> WOW_and_FLUTTER_Function(const std::vector<float>& x, int SAM
 
     return y;
 }
+*/
+
+
+
+
 
 void convolution(int channelName, int load)
 {
@@ -103,7 +154,7 @@ void convolution(int channelName, int load)
         Input_filename = projectPath + "RAW/" + project.channelNames[channelName] + ".wav";
     }
 
-    const std::string Impulse_filename = "C:\\Users\\alcin\\Desktop\\Convolution\\stream\\boy.wav";
+    const std::string Impulse_filename = "IRs\\TAPE_IR";
     const std::string outputfilename = projectPath + "PROCESSED/" + project.channelNames[channelName] + ".wav";
 
     std::cout << "INPUT FILENAME CONVOLUTION: " << Input_filename << std::endl;
@@ -191,8 +242,8 @@ void convolution(int channelName, int load)
 
     /****************************************************************************** STEP 3: WOW AND FLUTTER ***************************************************************************************/
 
-    // Apply WOW and FLUTTER effect. Originally wrote the Algorithm for Double instead of Float. This has the most computation time!
-    std::vector<float> finalSignal = WOW_and_FLUTTER_Function(combinedSignal, sRate, wFdepth, wFrate);
+
+    std::vector<float> finalSignal = WOW_and_FLUTTER_Function(combinedSignal);
 
 
 

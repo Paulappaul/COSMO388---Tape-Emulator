@@ -99,9 +99,6 @@ int selectedNumber = -1;
 //PORTAUDIO 
 bool PAstatus = false;
 
-// Parameters for WOW and FLUTTER effect
-double wFdepth = 0.7;  // Example depth in milliseconds
-double wFrate = 0.002;   // Example rate in Hz
 
 Fl_Counter* timeCounter;
 
@@ -378,7 +375,7 @@ void convolution(int channelName, int load);
 void WriteAudio(dataBuffer& datapass, int channel2Write);
 
 //Vector which handles the WOW and Flutter Processing
-std::vector<double> WOW_and_FLUTTER_Function(const std::vector<double>& x, int SAMPLERATE, double Modfreq, double Width);
+//std::vector<double> WOW_and_FLUTTER_Function(const std::vector<double>& x, int SAMPLERATE, double Modfreq, double Width);
 
  /********************************************************************COSMO FILE MANAGER*****************************************************************************/
  
